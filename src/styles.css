@@ -462,3 +462,11 @@ figure {
   border-radius: 0 3px 3px 0;
   background: var(--series);
 }
+
+.state-growth {
+  display: inline-block;
+  min-width: 3.4em;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-primary);
+}

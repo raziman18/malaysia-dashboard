@@ -36,19 +36,20 @@ it("joins GDP growth with the GDP level per quarter, oldest first", () => {
   ]);
 });
 
-it("ranks states by GDP share for the latest year only", () => {
+it("ranks states by GDP share for the latest year, with growth from the year before", () => {
   const rows = [
     { date: "2025-01-01", state: "Perlis", value: 10 },
     { date: "2025-01-01", state: "Selangor", value: 60 },
     { date: "2025-01-01", state: "Supra", value: 30 },
-    { date: "2024-01-01", state: "Selangor", value: 999 },
+    { date: "2024-01-01", state: "Selangor", value: 50 },
+    { date: "2024-01-01", state: "Supra", value: 40 },
   ];
   expect(stateGdpShares(rows)).toEqual({
     year: "2025",
     states: [
-      { state: "Selangor", ringgitMillions: 60, share: 60 },
-      { state: "Supra", ringgitMillions: 30, share: 30 },
-      { state: "Perlis", ringgitMillions: 10, share: 10 },
+      { state: "Selangor", ringgitMillions: 60, share: 60, growth: 20 },
+      { state: "Supra", ringgitMillions: 30, share: 30, growth: -25 },
+      { state: "Perlis", ringgitMillions: 10, share: 10, growth: undefined },
     ],
   });
 });

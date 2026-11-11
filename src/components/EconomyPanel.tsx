@@ -1,6 +1,6 @@
 import { fetchFuelPrice, fetchGdp, fetchInflation, fetchStateGdp, fetchUnemployment, type fetchExchangeRates } from "../api";
 import type { Point } from "../lib/economy";
-import { dayLabel, monthLabel, quarterLabel, ringgit, ringgitBillions } from "../lib/format";
+import { dayLabel, monthLabel, quarterLabel, ringgit, ringgitBillions, signedPercent } from "../lib/format";
 import { useFetch, type FetchState } from "../useFetch";
 import { BarChart } from "./BarChart";
 import { Sparkline } from "./Sparkline";
@@ -58,13 +58,15 @@ export function EconomyPanel({ rates, klci }: { rates: FetchState<Rates>; klci: 
       <Async state={stateGdp}>
         {({ year, states }) => (
           <>
-            <h3>GDP contribution by state, {year}</h3>
+            <h3>GDP by state, {year}</h3>
+            <p className="muted">Share of national GDP, amount, and growth from {Number(year) - 1}.</p>
             <ul className="state-bars">
               {states.map((item) => (
                 <li key={item.state}>
                   <span>{item.state === "Supra" ? "Supra (offshore, not in any state)" : item.state}</span>
                   <span className="muted">
-                    <strong>{item.share.toFixed(1)}%</strong> {ringgitBillions(item.ringgitMillions)}
+                    <strong>{item.share.toFixed(1)}%</strong> {ringgitBillions(item.ringgitMillions)}{" "}
+                    <span className="state-growth">{item.growth === undefined ? "n/a" : signedPercent(item.growth)}</span>
                   </span>
                   <span className="state-bar" style={{ width: `${(item.share / states[0].share) * 100}%` }} />
                 </li>

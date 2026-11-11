@@ -33,16 +33,24 @@ export interface StateGdp {
   state: string;
   ringgitMillions: number;
   share: number;
+  growth?: number;
 }
 
 // Share of national GDP for the latest year, largest first. DOSM has no national row, so the total is the sum of
 // all rows, including "Supra" (output not assigned to any state, mainly offshore oil and gas).
+// Growth is computed from the previous year's level because DOSM publishes it for the 13 states only, not the
+// federal territories or Supra. The computed values match DOSM's published state figures.
 export function stateGdpShares(rows: { date: string; state: string; value: number }[]): { year: string; states: StateGdp[] } {
   const year = rows.map((row) => row.date).sort().at(-1) ?? "";
+  const previousYear = `${Number(year.slice(0, 4)) - 1}${year.slice(4)}`;
+  const previous = new Map(rows.filter((row) => row.date === previousYear).map((row) => [row.state, row.value]));
   const latest = rows.filter((row) => row.date === year);
   const total = latest.reduce((sum, row) => sum + row.value, 0);
   const states = latest
-    .map((row) => ({ state: row.state, ringgitMillions: row.value, share: (row.value / total) * 100 }))
+    .map((row) => {
+      const before = previous.get(row.state);
+      return { state: row.state, ringgitMillions: row.value, share: (row.value / total) * 100, growth: before && percentChange(row.value, before) };
+    })
     .sort((a, b) => b.ringgitMillions - a.ringgitMillions);
   return { year: year.slice(0, 4), states };
 }

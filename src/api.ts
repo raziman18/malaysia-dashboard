@@ -31,9 +31,9 @@ export async function fetchInflation() {
 // Three series per quarter, so 36 rows cover the last 12 quarters.
 export const fetchGdp = async () => joinGdpSeries(await catalogue<{ date: string; value: number; series: string }>("id=gdp_qtr_real&sort=-date&limit=36"));
 
-// Annual, all sectors (p0). 17 rows a year: 13 states, 3 federal territories and Supra.
+// Annual, all sectors (p0). 17 rows a year (13 states, 3 federal territories and Supra), so 34 rows cover two years.
 export const fetchStateGdp = async () =>
-  stateGdpShares(await catalogue<{ date: string; state: string; value: number }>("id=gdp_state_real_supply&filter=p0@sector,abs@series&sort=-date&limit=17"));
+  stateGdpShares(await catalogue<{ date: string; state: string; value: number }>("id=gdp_state_real_supply&filter=p0@sector,abs@series&sort=-date&limit=34"));
 
 export const fetchUnemployment = async () => (await catalogue<{ date: string; u_rate: number }>("id=lfs_month&sort=-date&limit=1"))[0];
 
