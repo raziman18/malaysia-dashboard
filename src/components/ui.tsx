@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { headlineTone, type Headline } from "../lib/headlines";
+import { toneOf, type Headline } from "../lib/headlines";
 import { timeLabel } from "../lib/format";
 import type { Status } from "../lib/status";
 import type { FetchState } from "../useFetch";
@@ -48,7 +48,10 @@ export function HeadlineList({ headlines, limit = 6 }: { headlines: Headline[]; 
         <li key={headline.link}>
           {headline.image && <img src={headline.image} alt="" loading="lazy" referrerPolicy="no-referrer" />}
           <div>
-            <span className={`tone tone-${headlineTone(headline.title)}`}>{headlineTone(headline.title)}</span>
+            <span className={`tone tone-${toneOf(headline)}`}>
+              {toneOf(headline)}
+              {!headline.tone && <span title="Keyword guess until the AI label arrives">?</span>}
+            </span>
             <a href={headline.link} target="_blank" rel="noreferrer">{headline.title}</a>
             <span className="muted">{headline.source}, {timeLabel(headline.published)}</span>
           </div>

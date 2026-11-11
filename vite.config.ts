@@ -2,6 +2,7 @@
 import { defineConfig, loadEnv, type Plugin, type ProxyOptions } from "vite";
 import react from "@vitejs/plugin-react";
 import { dataGovUrl } from "./api/gov";
+import { labelTone } from "./api/tone";
 
 // The public APIs block browser requests from other origins (CORS), so the dev server forwards them.
 const forward = (target: string, prefix: string, headers?: Record<string, string>): ProxyOptions => ({
@@ -50,17 +51,35 @@ function dataGovMy(token?: string): Plugin {
   };
 }
 
-export default defineConfig(({ mode }) => ({
-  plugins: [react(), dataGovMy(loadEnv(mode, process.cwd(), "").DATA_GOV_MY_TOKEN)],
-  server: {
-    proxy: {
-      "/api/bnm": forward("https://api.bnm.gov.my/public", "/api/bnm"),
-      "/api/fmt": forward("https://cms.freemalaysiatoday.com", "/api/fmt", { "User-Agent": "Mozilla/5.0" }),
-      "/api/malaymail": forward("https://www.malaymail.com", "/api/malaymail", { "User-Agent": "Mozilla/5.0" }),
-      "/api/nst": forward("https://www.nst.com.my", "/api/nst", { "User-Agent": "Mozilla/5.0" }),
-      "/api/air": forward("https://air-quality-api.open-meteo.com/v1", "/api/air"),
-      "/api/market": forward("https://query1.finance.yahoo.com/v8/finance", "/api/market", { "User-Agent": "Mozilla/5.0" }),
+// Serves the same /api/tone function that Vercel runs.
+function toneLabels(apiKey?: string): Plugin {
+  return {
+    name: "tone-labels",
+    configureServer(server) {
+      server.middlewares.use("/api/tone", async (request, response) => {
+        const reply = await labelTone(`http://localhost${request.originalUrl}`, apiKey);
+        response.statusCode = reply.status;
+        reply.headers.forEach((value, key) => response.setHeader(key, value));
+        response.end(await reply.text());
+      });
     },
-  },
-  test: { environment: "jsdom" },
-}));
+  };
+}
+
+export default defineConfig(({ mode }) => {
+  const env = loadEnv(mode, process.cwd(), "");
+  return {
+    plugins: [react(), dataGovMy(env.DATA_GOV_MY_TOKEN), toneLabels(env.GROQ_API_KEY)],
+    server: {
+      proxy: {
+        "/api/bnm": forward("https://api.bnm.gov.my/public", "/api/bnm"),
+        "/api/fmt": forward("https://cms.freemalaysiatoday.com", "/api/fmt", { "User-Agent": "Mozilla/5.0" }),
+        "/api/malaymail": forward("https://www.malaymail.com", "/api/malaymail", { "User-Agent": "Mozilla/5.0" }),
+        "/api/nst": forward("https://www.nst.com.my", "/api/nst", { "User-Agent": "Mozilla/5.0" }),
+        "/api/air": forward("https://air-quality-api.open-meteo.com/v1", "/api/air"),
+        "/api/market": forward("https://query1.finance.yahoo.com/v8/finance", "/api/market", { "User-Agent": "Mozilla/5.0" }),
+      },
+    },
+    test: { environment: "jsdom" },
+  };
+});

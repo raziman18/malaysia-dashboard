@@ -52,7 +52,7 @@ function candidates(input: GlanceInputs, now: Date): GlanceItem[] {
     items.push({ id: "ringgit", label: "USD / MYR", value: ringgit(usdRate, 4), detail: "BNM middle rate", priority: 0 });
   }
   if (topNews) {
-    const tone = toneSummary(topNews.map((headline) => headline.title));
+    const tone = toneSummary(topNews);
     const negativeShare = tone.total ? tone.negative / tone.total : 0;
     items.push({ id: "headlines", label: "Negative headlines", value: `${tone.negative} / ${tone.total}`, detail: "All stories, last 24 hours", priority: negativeShare >= 0.3 ? 2 : 0 });
   }

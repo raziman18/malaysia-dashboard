@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { headlineTone, parseRss, toneSummary } from "./headlines";
+import { headlineTone, parseRss, toneSummary, type Headline } from "./headlines";
 
 describe("parseRss", () => {
   it("reads items and strips the source suffix from titles", () => {
@@ -41,7 +41,14 @@ describe("headlineTone", () => {
     expect(headlineTone("Diesel price unchanged")).toBe("neutral");
   });
 
-  it("summarises a set of headlines", () => {
-    expect(toneSummary(["Floods kill two", "Ringgit gains", "Cabinet meets"])).toEqual({ positive: 1, negative: 1, neutral: 1, total: 3 });
+  it("summarises headlines, preferring AI labels over keyword guesses", () => {
+    const story = (title: string, tone?: Headline["tone"]): Headline => ({ title, tone, description: "", source: "", link: title, published: new Date() });
+    expect(toneSummary([story("Floods kill two"), story("Ringgit gains"), story("Cabinet meets", "negative")])).toEqual({
+      positive: 1,
+      negative: 2,
+      neutral: 0,
+      total: 3,
+      aiLabelled: 1,
+    });
   });
 });

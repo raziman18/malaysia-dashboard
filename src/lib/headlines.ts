@@ -5,6 +5,8 @@ export interface Headline {
   link: string;
   published: Date;
   image?: string;
+  // Set once the AI has labelled the headline. Until then the keyword guess is used.
+  tone?: Tone;
 }
 
 export type Tone = "positive" | "negative" | "neutral";
@@ -40,8 +42,10 @@ export function headlineTone(title: string): Tone {
   return "neutral";
 }
 
-export function toneSummary(titles: string[]) {
+export const toneOf = (headline: Headline): Tone => headline.tone ?? headlineTone(headline.title);
+
+export function toneSummary(headlines: Headline[]) {
   const counts: Record<Tone, number> = { positive: 0, negative: 0, neutral: 0 };
-  titles.forEach((title) => counts[headlineTone(title)]++);
-  return { ...counts, total: titles.length };
+  headlines.forEach((headline) => counts[toneOf(headline)]++);
+  return { ...counts, total: headlines.length, aiLabelled: headlines.filter((headline) => headline.tone).length };
 }

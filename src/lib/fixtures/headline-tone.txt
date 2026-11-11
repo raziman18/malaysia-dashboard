@@ -1,0 +1,93 @@
+# Hand-labelled Malaysian headlines (FMT, Malay Mail, NST, 11 Nov 2026) for measuring tone accuracy.
+# negative: real harm or setback (disaster, death, crime, loss, default, failure)
+# positive: real benefit or improvement (price cut, aid, achievement, new service)
+# neutral: statements, procedures, and political back-and-forth without clear harm or benefit
+positive|Unsubsidised fuel prices to drop across the board
+neutral|Lawyer launches book on challenging land acquisition
+neutral|PH’s Esma wants to create jobs in Rim, so youths don’t have to look elsewhere
+negative|Authorities seize pig, chicken carcasses worth RM1.7mil in Selangor, KL
+positive|FGV Palm Industries cleared of conviction over effluent discharge
+negative|Dept wants water release from dam suspended as search for victims goes on
+positive|Govt sets aside RM15mil a month to maintain bottled cooking oil prices
+neutral|High Court transfers constitutional challenge on freedom of religion to Shah Alam
+negative|Loke’s resignation appears to question king’s pardoning powers, says Mohamad
+neutral|Shahrir to proceed with malicious prosecution suit against ex-AG Thomas
+positive|Defence ministry to fast-track cyber force’s establishment, says Khaled
+negative|Another miserable day for M’sian shuttlers in Japan Masters
+neutral|Only S’gor, Kedah have set minimum marriage age for Muslims at 18, says Nancy
+neutral|Bright light seen over Sabah caused by Chinese rocket launch, says space agency
+neutral|Kelantan govt confirms Kamarudin’s exit from state exco
+neutral|Umno should publicly disclose Najib fund details, says analyst
+neutral|‘Centuries of service’ cannot justify corruption, says Anwar
+neutral|JPJ’s firm enforcement must outlast ministerial changes, says Loke
+positive|S’gor to introduce structured internship for students in industrial training
+positive|Native Courts Bill marks major milestone in Sabah’s court reform, says Hajiji
+neutral|Adly rubbishes claim on DAP leaders declining honorary titles
+neutral|Azeez gets leave to challenge LHDN’s cancellation of RM4.8mil tax settlement
+neutral|Social media platforms to submit online safety plans by Dec 28
+negative|Kampung Melayu Subang faces 4th flood in 11 days
+neutral|High Court awards boy RM30,000 over broken leg in religious class
+neutral|Mat Sabu calls for law to make house arrest available to all convicts
+neutral|Zahid wary of losing ministerial post in Cabinet reshuffle, says Puad
+neutral|Amanah’s report card doesn’t warrant Mat Sabu’s confidence in Melaka, says analyst
+neutral|Minor Cabinet reshuffle of DAP leaders expected after Loke’s exit
+neutral|Melaka victory could boost BN-PN’s push for early GE16, says analyst
+positive|Chet Singh, the quiet hand behind Penang’s industrial rise
+neutral|Najib’s house arrest row may spur voters to cast their ballots, say analysts
+neutral|AG was right to question Najib’s discharge order, says lawyer
+neutral|Use Melaka polls to express views on Najib, Loke urges voters
+negative|Chet Singh, pioneer of Penang’s electronics boom, dies at 90
+neutral|Loke dares BN to quit govt, but says it fears losing influence
+neutral|BN looking to wrest at least 1 Chinese seat from DAP in Melaka
+neutral|K’tan Bersatu chief confirms receiving letter on termination of exco appointment
+neutral|Postpone river, waterfall activities during monsoon, says fire dept
+neutral|Shouts of ‘Bossku’ as Najib arrives at Taman Duta home
+positive|Gardenia says products pass safety tests after food poisoning claims
+negative|Zetrix AI confirms RM25mil sukuk default, pledges quick settlement
+negative|Cops await instructions in case of Penang rep accused of hurting wife
+neutral|Anwar quotes Prophet’s warning on unequal punishment after Najib’s house arrest
+negative|MACC nabs local authority officer on suspicion of graft
+negative|Mental health patient found dead, fellow resident arrested
+negative|Chinese national who drove off with son clinging to car nabbed
+neutral|Revised court order shows AG wasn’t defying king, says MP
+neutral|‘Thank God’, Rosmah says as she awaits Najib’s return
+neutral|Only courts can draft orders in criminal matters, says Shafee
+neutral|Nanta confirms he will remain Kapit MP, not contest Sarawak polls
+neutral|IGP says Prisons Dept responsible for Najib’s home security
+positive|Government steps in with RM15m monthly subsidy as palm oil costs rise
+negative|Car washer charged with murder over fatal Jalan Kuching crash that killed lorry driver
+neutral|Azalina: Land acquisition must uphold rule of law, respect constitutional safeguards
+positive|Nadma deploys 102,000 personnel ahead of 2026/2027 northeast monsoon
+negative|Tragedy on the Melaka campaign trail: Car hits lorry, Alor Gajah PKR deputy chief dies in crash outside campaign operations room
+neutral|Re-ignite the Malaysian Dream, Lim Kit Siang urges Melaka voters
+negative|Flood situation worsens in Selangor as evacuees increase, improves in Perak
+neutral|Funding Malaysia’s SMEs is about quality and not quantity, says economy minister
+neutral|Kelantan exco shake-up: Deputy MB says Bersatu rep’s appointment not renewed, with Sultan’s consent
+negative|Skudai Deepavali fireworks stunt ends in court for four, one just 16
+neutral|Anwar: ‘Hundreds of years of service’ no excuse, corrupt people belong in prison
+neutral|What are the terms of Najib’s house arrest? Saifuddin Nasution to explain in Dewan Rakyat
+negative|Monsoon surge triggers continuous rain alert for Kelantan, Terengganu and Sabah until tomorrow
+neutral|Loke: JPJ’s war on overloaded lorries must continue even without me, as it involves human lives
+neutral|Umno says opposing Najib’s house arrest could amount to challenging King’s constitutional powers
+neutral|Rosmah not allowed to live with Najib during house arrest, Umno leader says
+neutral|‘Camera must follow the schedule’: Hannah Yeoh says as DBKL makes body cams compulsory for field operations
+neutral|BN MPs want AG to take leave over four-day delay in Najib’s house arrest
+neutral|DAP yet to pick candidate to replace Loke as transport minister, for PM to decide
+neutral|Ex-Tabung Haji chief Azeez gets court nod to challenge IRB’s cancellation of RM4.8m tax deal
+negative|Trader suspected of sourcing frozen chicken from Thailand arrested in raid
+neutral|Social media firms face Dec 28 deadline under Online Safety Act
+negative|MCMC finds 23 internet quality breaches in Muar, takes action against telcos
+neutral|‘A leader must be decisive’: Loke says ‘conscience is clear’ as he reflects on time as minister
+neutral|LPT3’s winning bidder will foot the bill, Works Ministry expects the cost to top RM10b
+negative|SAR operation resumes for three missing in Kuala Kubu Baharu water surge
+negative|Sixteen, including six children, rescued in Sungai Bakap flash floods
+negative|More than 1,300 displaced as floods worsen in Perak, Selangor
+positive|Sarawak prioritises talent over race in education, says Abang Jo
+neutral|Half in jail, half at home? Mat Sabu says to make it a rule for all, not a privilege for some
+positive|Taxpayers behind on CP500 won’t be barred from flying yet, says deputy finance minister
+neutral|A day after the rumours, the letter arrives: Bersatu rep Kamarudin out of Kelantan exco
+neutral|Quit unity govt if you disagree with PMX, DAP sec-gen tells BN over dissolution call
+neutral|‘Whether or not we accept it, we can vote’: Loke tells Melaka to use ballot box to convey feelings on Najib’s house arrest
+negative|Semporna resort had no licence, no expat approval and seven Chinese ‘tourists’ on staff
+neutral|A glowing thing in the sky at 4.40am? Kunak is asking what it was
+neutral|Anthony Loke quits Cabinet but says DAP still has Anwar’s back

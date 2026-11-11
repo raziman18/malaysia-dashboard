@@ -15,7 +15,7 @@ export function NewsPanel({ news }: { news: FetchState<Headline[]> }) {
   const [tab, setTab] = useState(tabs[0]);
 
   return (
-    <Panel title="News and sentiment" sources="Free Malaysia Today, Malay Mail, New Straits Times (last 24 hours). Tone is a rough keyword score, not a survey.">
+    <Panel title="News and sentiment" sources="Free Malaysia Today, Malay Mail, New Straits Times (last 24 hours). Tone labels come from an AI model on Groq; a ? marks a keyword guess.">
       <div className="tabs" role="tablist">
         {tabs.map((item) => (
           <button key={item.label} role="tab" aria-selected={item === tab} onClick={() => setTab(item)}>
@@ -28,7 +28,7 @@ export function NewsPanel({ news }: { news: FetchState<Headline[]> }) {
           const headlines = tab.topic ? filterByTopic(stories, tab.topic) : stories;
           return (
             <>
-              <ToneBar {...toneSummary(headlines.map((headline) => headline.title))} />
+              <ToneBar {...toneSummary(headlines)} />
               <HeadlineList headlines={headlines} limit={10} />
             </>
           );
@@ -37,7 +37,7 @@ export function NewsPanel({ news }: { news: FetchState<Headline[]> }) {
     </Panel>
   );
 }
-function ToneBar({ positive, neutral, negative, total }: ReturnType<typeof toneSummary>) {
+function ToneBar({ positive, neutral, negative, total, aiLabelled }: ReturnType<typeof toneSummary>) {
   if (!total) return null;
   const parts = [
     { key: "positive", count: positive },
@@ -52,7 +52,7 @@ function ToneBar({ positive, neutral, negative, total }: ReturnType<typeof toneS
         ))}
       </div>
       <figcaption className="muted">
-        {parts.map((part) => `${part.count} ${part.key}`).join(", ")} of {total} headlines
+        {parts.map((part) => `${part.count} ${part.key}`).join(", ")} of {total} headlines. AI labelled {aiLabelled}, the rest are keyword guesses.
       </figcaption>
     </figure>
   );

@@ -6,6 +6,7 @@ import { HazardPanel } from "./components/HazardPanel";
 import { HealthSafetyPanel } from "./components/HealthSafetyPanel";
 import { NewsPanel } from "./components/NewsPanel";
 import { filterByTopic } from "./lib/topics";
+import { useAiTones } from "./useAiTones";
 import { useFetch } from "./useFetch";
 
 const selectUsdRate = (rates: Awaited<ReturnType<typeof fetchExchangeRates>>) => rates.find((rate) => rate.code === "USD")?.ringgit;
@@ -14,7 +15,9 @@ export function App() {
   const warnings = useFetch(fetchWeatherWarnings);
   const air = useFetch(fetchAirQuality);
   const rates = useFetch(fetchExchangeRates);
-  const news = useFetch(fetchNews);
+  const loadedNews = useFetch(fetchNews);
+  const tones = useAiTones(loadedNews.data);
+  const news = { ...loadedNews, data: loadedNews.data?.map((headline) => ({ ...headline, tone: tones.get(headline.title) })) };
   const floodNews = { ...news, data: news.data && filterByTopic(news.data, "flood") };
   const floodStations = useFetch(fetchFloodStations);
   const earthquakes = useFetch(fetchEarthquakes);
