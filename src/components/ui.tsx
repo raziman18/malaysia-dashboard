@@ -46,9 +46,12 @@ export function HeadlineList({ headlines, limit = 6 }: { headlines: Headline[]; 
     <ul className="headlines">
       {headlines.slice(0, limit).map((headline) => (
         <li key={headline.link}>
-          <span className={`tone tone-${headlineTone(headline.title)}`}>{headlineTone(headline.title)}</span>
-          <a href={headline.link} target="_blank" rel="noreferrer">{headline.title}</a>
-          <span className="muted">{headline.source}, {timeLabel(headline.published)}</span>
+          {headline.image && <img src={headline.image} alt="" loading="lazy" referrerPolicy="no-referrer" />}
+          <div>
+            <span className={`tone tone-${headlineTone(headline.title)}`}>{headlineTone(headline.title)}</span>
+            <a href={headline.link} target="_blank" rel="noreferrer">{headline.title}</a>
+            <span className="muted">{headline.source}, {timeLabel(headline.published)}</span>
+          </div>
         </li>
       ))}
     </ul>

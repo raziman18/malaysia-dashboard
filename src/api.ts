@@ -1,5 +1,5 @@
 import { yearOnYearChange, type Point } from "./lib/economy";
-import { parseRss } from "./lib/headlines";
+import { parseRss, type Headline } from "./lib/headlines";
 import { activeWarnings, type Earthquake, type FloodStation, type WeatherWarning } from "./lib/warnings";
 
 async function request(url: string, init?: RequestInit) {
@@ -78,10 +78,21 @@ export async function fetchAirQuality() {
   return stateCapitals.map(([city], index) => ({ city, aqi: readings[index].current.us_aqi })).sort((a, b) => b.aqi - a.aqi);
 }
 
-// Google News search limited to the last 24 hours, Malaysian English edition.
-// Google sometimes answers 503 under light load, so one retry follows after a short pause.
-export async function fetchHeadlines(query: string) {
-  const url = `/api/news/search?q=${encodeURIComponent(`${query} when:1d`)}&hl=en-MY&gl=MY&ceid=MY:en`;
-  const response = await request(url).catch(() => new Promise((resolve) => setTimeout(resolve, 2000)).then(() => request(url)));
-  return parseRss(await response.text());
+// These outlets publish a photo with each story, which Google News does not.
+const newsFeeds = [
+  ["Free Malaysia Today", "/api/fmt/category/nation/feed"],
+  ["Free Malaysia Today", "/api/fmt/category/business/feed"],
+  ["Malay Mail", "/api/malaymail/feed/rss/malaysia"],
+  ["Malay Mail", "/api/malaymail/feed/rss/money"],
+  ["New Straits Times", "/api/nst/feed"],
+];
+
+// Stories from the last 24 hours, newest first. One failing outlet does not hide the others.
+export async function fetchNews(): Promise<Headline[]> {
+  const feeds = await Promise.allSettled(newsFeeds.map(async ([outlet, url]) => parseRss(await (await request(url)).text(), outlet)));
+  const loaded = feeds.flatMap((feed) => (feed.status === "fulfilled" ? feed.value : []));
+  if (!loaded.length) throw new Error("No news outlet responded");
+  const since = Date.now() - 86_400_000;
+  const unique = new Map(loaded.filter((story) => story.published.getTime() >= since).map((story) => [story.link, story]));
+  return [...unique.values()].sort((a, b) => b.published.getTime() - a.published.getTime());
 }

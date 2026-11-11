@@ -1,24 +1,30 @@
 export interface Headline {
   title: string;
+  description: string;
   source: string;
   link: string;
   published: Date;
+  image?: string;
 }
 
 export type Tone = "positive" | "negative" | "neutral";
 
-export function parseRss(xml: string): Headline[] {
+// Feeds without a <source> tag take the outlet name passed in.
+export function parseRss(xml: string, outlet = ""): Headline[] {
   const document = new DOMParser().parseFromString(xml, "text/xml");
   return [...document.querySelectorAll("item")].map((item) => {
-    const text = (tag: string) => item.querySelector(tag)?.textContent?.trim() ?? "";
-    const source = text("source");
+    const text = (tag: string) => item.getElementsByTagName(tag)[0]?.textContent?.trim() ?? "";
+    const source = text("source") || outlet;
     const title = text("title");
     const suffix = ` - ${source}`;
+    const media = item.getElementsByTagName("media:thumbnail")[0] ?? item.getElementsByTagName("media:content")[0];
     return {
       title: source && title.endsWith(suffix) ? title.slice(0, -suffix.length) : title,
+      description: new DOMParser().parseFromString(text("description"), "text/html").body.textContent ?? "",
       source,
       link: text("link"),
       published: new Date(text("pubDate")),
+      image: media?.getAttribute("url") ?? undefined,
     };
   });
 }

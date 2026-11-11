@@ -4,7 +4,7 @@ import type { Headline } from "./headlines";
 import type { Earthquake, FloodStation, WeatherWarning } from "./warnings";
 
 const now = new Date("2026-11-11T12:00:00+08:00");
-const headline = (title: string): Headline => ({ title, source: "", link: title, published: now });
+const headline = (title: string): Headline => ({ title, description: "", source: "", link: title, published: now });
 const warning = { warning_issue: { issued: "2026-11-11T08:00:00", title_en: "Thunderstorms Warning" } } as WeatherWarning;
 const quake = (magdefault: number, n_distancemas: string, localdatetime = "2026-11-11T09:00:00"): Earthquake => ({ magdefault, n_distancemas, localdatetime, location_original: "Sulawesi" });
 const station = (water_level_indicator: string, water_level_update_datetime: string) =>

@@ -1,23 +1,22 @@
 import { useEffect, useState } from "react";
-import { fetchAirQuality, fetchEarthquakes, fetchExchangeRates, fetchFloodStations, fetchHeadlines, fetchKlci, fetchWeatherWarnings } from "./api";
+import { fetchAirQuality, fetchEarthquakes, fetchExchangeRates, fetchFloodStations, fetchKlci, fetchNews, fetchWeatherWarnings } from "./api";
 import { EconomyPanel } from "./components/EconomyPanel";
 import { GlanceStrip } from "./components/GlanceStrip";
 import { HazardPanel } from "./components/HazardPanel";
 import { HealthSafetyPanel } from "./components/HealthSafetyPanel";
 import { NewsPanel } from "./components/NewsPanel";
+import { filterByTopic } from "./lib/topics";
 import { useFetch } from "./useFetch";
 
-const loadTopNews = () => fetchHeadlines("Malaysia");
-const loadFloodNews = () => fetchHeadlines("Malaysia flood OR banjir");
 const selectUsdRate = (rates: Awaited<ReturnType<typeof fetchExchangeRates>>) => rates.find((rate) => rate.code === "USD")?.ringgit;
 
 export function App() {
   const warnings = useFetch(fetchWeatherWarnings);
   const air = useFetch(fetchAirQuality);
   const rates = useFetch(fetchExchangeRates);
-  const topNews = useFetch(loadTopNews);
+  const news = useFetch(fetchNews);
+  const floodNews = { ...news, data: news.data && filterByTopic(news.data, "flood") };
   const floodStations = useFetch(fetchFloodStations);
-  const floodNews = useFetch(loadFloodNews);
   const earthquakes = useFetch(fetchEarthquakes);
   const klci = useFetch(fetchKlci);
   const [now, setNow] = useState(new Date());
@@ -42,7 +41,7 @@ export function App() {
         warnings={warnings}
         air={air}
         usdRate={{ data: rates.data && selectUsdRate(rates.data) }}
-        topNews={topNews}
+        topNews={news}
         floodStations={floodStations}
         floodNews={floodNews}
         earthquakes={earthquakes}
@@ -51,8 +50,8 @@ export function App() {
       <div className="grid">
         <HazardPanel warnings={warnings} air={air} stations={floodStations} floodNews={floodNews} />
         <EconomyPanel rates={rates} klci={klci} />
-        <HealthSafetyPanel earthquakes={earthquakes} />
-        <NewsPanel topNews={topNews} />
+        <HealthSafetyPanel earthquakes={earthquakes} news={news} />
+        <NewsPanel news={news} />
       </div>
     </main>
   );

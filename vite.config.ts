@@ -53,7 +53,9 @@ export default defineConfig(({ mode }) => ({
   server: {
     proxy: {
       "/api/bnm": forward("https://api.bnm.gov.my/public", "/api/bnm"),
-      "/api/news": forward("https://news.google.com/rss", "/api/news"),
+      "/api/fmt": forward("https://cms.freemalaysiatoday.com", "/api/fmt", { "User-Agent": "Mozilla/5.0" }),
+      "/api/malaymail": forward("https://www.malaymail.com", "/api/malaymail", { "User-Agent": "Mozilla/5.0" }),
+      "/api/nst": forward("https://www.nst.com.my", "/api/nst", { "User-Agent": "Mozilla/5.0" }),
       "/api/air": forward("https://air-quality-api.open-meteo.com/v1", "/api/air"),
       "/api/market": forward("https://query1.finance.yahoo.com/v8/finance", "/api/market", { "User-Agent": "Mozilla/5.0" }),
     },

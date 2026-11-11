@@ -3,7 +3,7 @@ import { dayLabel, timeLabel } from "../lib/format";
 import { airQualityBand } from "../lib/status";
 import type { Headline } from "../lib/headlines";
 import { isFeedFresh, latestStationUpdate, malaysiaTime, stationsAboveNormal, type FloodStation, type WeatherWarning } from "../lib/warnings";
-import type { FetchState } from "../useFetch";
+import { useFetch, type FetchState } from "../useFetch";
 import { Async, HeadlineList, Panel, StatusBadge } from "./ui";
 
 type AirReadings = Awaited<ReturnType<typeof fetchAirQuality>>;
@@ -15,10 +15,15 @@ interface Props {
   floodNews: FetchState<Headline[]>;
 }
 
+// A new timestamp every refresh makes the browser fetch the latest radar image.
+const loadRadarStamp = async () => Date.now();
+
 export function HazardPanel({ warnings, air, stations, floodNews }: Props) {
+  const radarStamp = useFetch(loadRadarStamp);
+  const radarUrl = `https://www.met.gov.my/data/radar_malaysia.gif?t=${radarStamp.data ?? ""}`;
 
   return (
-    <Panel title="Disasters and weather" sources="MET Malaysia and JPS via data.gov.my, Open-Meteo air quality, Google News">
+    <Panel title="Disasters and weather" sources="MET Malaysia and JPS via data.gov.my, MET Malaysia radar, Open-Meteo air quality, Free Malaysia Today, Malay Mail, New Straits Times">
       <h3>Active weather warnings</h3>
       <Async state={warnings}>
         {(list) =>
@@ -41,6 +46,14 @@ export function HazardPanel({ warnings, air, stations, floodNews }: Props) {
           )
         }
       </Async>
+
+      <h3>Rain radar</h3>
+      {radarStamp.data && (
+        <a className="radar" href={radarUrl} target="_blank" rel="noreferrer">
+          <img src={radarUrl} alt="MET Malaysia rain radar map of Peninsular Malaysia, Sabah and Sarawak" referrerPolicy="no-referrer" />
+          <span className="muted">MET Malaysia composite radar. Tap to open full size.</span>
+        </a>
+      )}
 
       <h3>Floods</h3>
       <Async state={stations}>

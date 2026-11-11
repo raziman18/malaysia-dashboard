@@ -54,7 +54,7 @@ function candidates(input: GlanceInputs, now: Date): GlanceItem[] {
   if (topNews) {
     const tone = toneSummary(topNews.map((headline) => headline.title));
     const negativeShare = tone.total ? tone.negative / tone.total : 0;
-    items.push({ id: "headlines", label: "Negative headlines", value: `${tone.negative} / ${tone.total}`, detail: "Top stories, last 24 hours", priority: negativeShare >= 0.3 ? 2 : 0 });
+    items.push({ id: "headlines", label: "Negative headlines", value: `${tone.negative} / ${tone.total}`, detail: "All stories, last 24 hours", priority: negativeShare >= 0.3 ? 2 : 0 });
   }
 
   const risingRivers = floodStations && isFeedFresh(floodStations, now) ? stationsAboveNormal(floodStations) : [];

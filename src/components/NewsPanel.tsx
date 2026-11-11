@@ -1,37 +1,34 @@
-import { useCallback, useState } from "react";
-import { fetchHeadlines } from "../api";
+import { useState } from "react";
 import { toneSummary, type Headline } from "../lib/headlines";
-import { useFetch, type FetchState } from "../useFetch";
+import { filterByTopic, type Topic } from "../lib/topics";
+import type { FetchState } from "../useFetch";
 import { Async, HeadlineList, Panel } from "./ui";
 
-const topics = [
-  { label: "Top stories", query: null },
-  { label: "Economy", query: "Malaysia economy OR ringgit OR Bursa" },
-  { label: "Politics", query: "Malaysia parliament OR cabinet OR \"Prime Minister\"" },
-  { label: "Sabah and Sarawak", query: "Sabah OR Sarawak" },
+const tabs: { label: string; topic: Topic | null }[] = [
+  { label: "All stories", topic: null },
+  { label: "Economy", topic: "economy" },
+  { label: "Politics", topic: "politics" },
+  { label: "Sabah and Sarawak", topic: "borneo" },
 ];
 
-export function NewsPanel({ topNews }: { topNews: FetchState<Headline[]> }) {
-  const [topic, setTopic] = useState(topics[0]);
-  const loadTopic = useCallback(() => fetchHeadlines(topic.query!), [topic]);
-  const topicNews = useFetch(topic.query ? loadTopic : null);
-  const news = topic.query ? topicNews : topNews;
+export function NewsPanel({ news }: { news: FetchState<Headline[]> }) {
+  const [tab, setTab] = useState(tabs[0]);
 
   return (
-    <Panel title="News and sentiment" sources="Google News (last 24 hours). Tone is a rough keyword score, not a survey.">
+    <Panel title="News and sentiment" sources="Free Malaysia Today, Malay Mail, New Straits Times (last 24 hours). Tone is a rough keyword score, not a survey.">
       <div className="tabs" role="tablist">
-        {topics.map((item) => (
-          <button key={item.label} role="tab" aria-selected={item === topic} onClick={() => setTopic(item)}>
+        {tabs.map((item) => (
+          <button key={item.label} role="tab" aria-selected={item === tab} onClick={() => setTab(item)}>
             {item.label}
           </button>
         ))}
       </div>
       <Async state={news}>
-        {(headlines) => {
-          const tone = toneSummary(headlines.map((headline) => headline.title));
+        {(stories) => {
+          const headlines = tab.topic ? filterByTopic(stories, tab.topic) : stories;
           return (
             <>
-              <ToneBar {...tone} />
+              <ToneBar {...toneSummary(headlines.map((headline) => headline.title))} />
               <HeadlineList headlines={headlines} limit={10} />
             </>
           );
@@ -40,7 +37,6 @@ export function NewsPanel({ topNews }: { topNews: FetchState<Headline[]> }) {
     </Panel>
   );
 }
-
 function ToneBar({ positive, neutral, negative, total }: ReturnType<typeof toneSummary>) {
   if (!total) return null;
   const parts = [
