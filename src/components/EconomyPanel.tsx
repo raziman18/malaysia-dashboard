@@ -1,6 +1,6 @@
-import { fetchFuelPrice, fetchGdpGrowth, fetchInflation, fetchUnemployment, type fetchExchangeRates } from "../api";
+import { fetchFuelPrice, fetchGdp, fetchInflation, fetchStateGdp, fetchUnemployment, type fetchExchangeRates } from "../api";
 import type { Point } from "../lib/economy";
-import { dayLabel, monthLabel, quarterLabel, ringgit } from "../lib/format";
+import { dayLabel, monthLabel, quarterLabel, ringgit, ringgitBillions } from "../lib/format";
 import { useFetch, type FetchState } from "../useFetch";
 import { BarChart } from "./BarChart";
 import { Sparkline } from "./Sparkline";
@@ -12,10 +12,11 @@ export function EconomyPanel({ rates, klci }: { rates: FetchState<Rates>; klci: 
   const fuel = useFetch(fetchFuelPrice);
   const inflation = useFetch(fetchInflation);
   const unemployment = useFetch(fetchUnemployment);
-  const gdp = useFetch(fetchGdpGrowth);
+  const gdp = useFetch(fetchGdp);
+  const stateGdp = useFetch(fetchStateGdp);
 
   return (
-    <Panel title="Economy" sources="Bank Negara Malaysia, data.gov.my (DOSM, Ministry of Finance), Yahoo Finance (unofficial)">
+    <Panel title="Economy" sources="Bank Negara Malaysia, data.gov.my (DOSM, Ministry of Finance; real GDP at constant 2015 prices), Yahoo Finance (unofficial)">
       <div className="tiles">
         <Async state={rates}>
           {(list) => list.map((rate) => (
@@ -31,7 +32,10 @@ export function EconomyPanel({ rates, klci }: { rates: FetchState<Rates>; klci: 
           )}
         </Async>
         <Async state={gdp}>
-          {(points) => <StatTile label="GDP growth, year on year" value={`${points.at(-1)!.value.toFixed(1)}%`} detail={`Real GDP, ${quarterLabel(points.at(-1)!.date)}`} />}
+          {(quarters) => {
+            const latest = quarters.at(-1)!;
+            return <StatTile label="GDP, real" value={ringgitBillions(latest.ringgitMillions)} detail={`Up ${latest.growth.toFixed(1)}% on a year earlier, ${quarterLabel(latest.date)}`} />;
+          }}
         </Async>
         <Async state={inflation}>
           {(cpi) => <StatTile label="Inflation, year on year" value={cpi.yearOnYear === undefined ? "n/a" : `${cpi.yearOnYear.toFixed(1)}%`} detail={monthLabel(cpi.date)} />}
@@ -41,7 +45,33 @@ export function EconomyPanel({ rates, klci }: { rates: FetchState<Rates>; klci: 
         </Async>
       </div>
       <Async state={gdp}>
-        {(points) => <BarChart title="Real GDP growth, year on year, by quarter" points={points} format={(value) => `${value.toFixed(1)}%`} label={quarterLabel} />}
+        {(quarters) => (
+          <BarChart
+            title="Real GDP growth, year on year, by quarter"
+            points={quarters.map((quarter) => ({ date: quarter.date, value: quarter.growth }))}
+            format={(value) => `${value.toFixed(1)}%`}
+            label={quarterLabel}
+            describe={(date) => ringgitBillions(quarters.find((quarter) => quarter.date === date)!.ringgitMillions)}
+          />
+        )}
+      </Async>
+      <Async state={stateGdp}>
+        {({ year, states }) => (
+          <>
+            <h3>GDP contribution by state, {year}</h3>
+            <ul className="state-bars">
+              {states.map((item) => (
+                <li key={item.state}>
+                  <span>{item.state === "Supra" ? "Supra (offshore, not in any state)" : item.state}</span>
+                  <span className="muted">
+                    <strong>{item.share.toFixed(1)}%</strong> {ringgitBillions(item.ringgitMillions)}
+                  </span>
+                  <span className="state-bar" style={{ width: `${(item.share / states[0].share) * 100}%` }} />
+                </li>
+              ))}
+            </ul>
+          </>
+        )}
       </Async>
       <Async state={klci}>{(points) => <Sparkline title="FBM KLCI, last month" points={points} format={(value) => value.toFixed(2)} />}</Async>
     </Panel>

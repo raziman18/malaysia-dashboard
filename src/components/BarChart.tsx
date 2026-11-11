@@ -6,7 +6,16 @@ const height = 64;
 const inset = 4;
 
 // A single-series bar chart from a zero baseline, so negative values hang below it. Hovering a bar moves the readout.
-export function BarChart({ title, points, format, label }: { title: string; points: Point[]; format: (value: number) => string; label: (date: string) => string }) {
+interface Props {
+  title: string;
+  points: Point[];
+  format: (value: number) => string;
+  label: (date: string) => string;
+  // Extra text shown in the readout for the active bar, such as a second measure for that date.
+  describe?: (date: string) => string;
+}
+
+export function BarChart({ title, points, format, label, describe }: Props) {
   const [hovered, setHovered] = useState<number>();
   if (!points.length) return null;
 
@@ -24,7 +33,8 @@ export function BarChart({ title, points, format, label }: { title: string; poin
       <figcaption>
         <span>{title}</span>
         <span>
-          <strong>{format(active.value)}</strong> <span className="muted">{label(active.date)}</span>
+          <strong>{format(active.value)}</strong>
+          {describe && <strong>, {describe(active.date)}</strong>} <span className="muted">{label(active.date)}</span>
         </span>
       </figcaption>
       <svg

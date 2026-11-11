@@ -1,4 +1,4 @@
-import { yearOnYearChange, type Point } from "./lib/economy";
+import { joinGdpSeries, stateGdpShares, yearOnYearChange, type Point } from "./lib/economy";
 import { parseRss, type Headline } from "./lib/headlines";
 import { activeWarnings, type Earthquake, type FloodStation, type WeatherWarning } from "./lib/warnings";
 
@@ -28,10 +28,12 @@ export async function fetchInflation() {
   return { date: rows[0].date, yearOnYear: yearOnYearChange(rows.map((row) => ({ date: row.date, value: row.index }))) };
 }
 
-export async function fetchGdpGrowth(): Promise<Point[]> {
-  const rows = await catalogue<{ date: string; value: number }>("id=gdp_qtr_real&filter=growth_yoy@series&sort=-date&limit=12");
-  return rows.map((row) => ({ date: row.date, value: row.value })).reverse();
-}
+// Three series per quarter, so 36 rows cover the last 12 quarters.
+export const fetchGdp = async () => joinGdpSeries(await catalogue<{ date: string; value: number; series: string }>("id=gdp_qtr_real&sort=-date&limit=36"));
+
+// Annual, all sectors (p0). 17 rows a year: 13 states, 3 federal territories and Supra.
+export const fetchStateGdp = async () =>
+  stateGdpShares(await catalogue<{ date: string; state: string; value: number }>("id=gdp_state_real_supply&filter=p0@sector,abs@series&sort=-date&limit=17"));
 
 export const fetchUnemployment = async () => (await catalogue<{ date: string; u_rate: number }>("id=lfs_month&sort=-date&limit=1"))[0];
 
