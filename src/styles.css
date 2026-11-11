@@ -434,3 +434,11 @@ figure {
     align-items: start;
   }
 }
+
+.bar-chart rect {
+  fill: var(--series);
+}
+
+.bar-chart rect.dimmed {
+  opacity: 0.45;
+}

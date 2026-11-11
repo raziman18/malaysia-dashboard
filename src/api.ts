@@ -28,6 +28,11 @@ export async function fetchInflation() {
   return { date: rows[0].date, yearOnYear: yearOnYearChange(rows.map((row) => ({ date: row.date, value: row.index }))) };
 }
 
+export async function fetchGdpGrowth(): Promise<Point[]> {
+  const rows = await catalogue<{ date: string; value: number }>("id=gdp_qtr_real&filter=growth_yoy@series&sort=-date&limit=12");
+  return rows.map((row) => ({ date: row.date, value: row.value })).reverse();
+}
+
 export const fetchUnemployment = async () => (await catalogue<{ date: string; u_rate: number }>("id=lfs_month&sort=-date&limit=1"))[0];
 
 export async function fetchExchangeRates() {

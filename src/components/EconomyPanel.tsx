@@ -1,7 +1,8 @@
-import { fetchFuelPrice, fetchInflation, fetchUnemployment, type fetchExchangeRates } from "../api";
+import { fetchFuelPrice, fetchGdpGrowth, fetchInflation, fetchUnemployment, type fetchExchangeRates } from "../api";
 import type { Point } from "../lib/economy";
-import { dayLabel, monthLabel, ringgit } from "../lib/format";
+import { dayLabel, monthLabel, quarterLabel, ringgit } from "../lib/format";
 import { useFetch, type FetchState } from "../useFetch";
+import { BarChart } from "./BarChart";
 import { Sparkline } from "./Sparkline";
 import { Async, Panel, StatTile } from "./ui";
 
@@ -11,6 +12,7 @@ export function EconomyPanel({ rates, klci }: { rates: FetchState<Rates>; klci: 
   const fuel = useFetch(fetchFuelPrice);
   const inflation = useFetch(fetchInflation);
   const unemployment = useFetch(fetchUnemployment);
+  const gdp = useFetch(fetchGdpGrowth);
 
   return (
     <Panel title="Economy" sources="Bank Negara Malaysia, data.gov.my (DOSM, Ministry of Finance), Yahoo Finance (unofficial)">
@@ -28,6 +30,9 @@ export function EconomyPanel({ rates, klci }: { rates: FetchState<Rates>; klci: 
             </>
           )}
         </Async>
+        <Async state={gdp}>
+          {(points) => <StatTile label="GDP growth, year on year" value={`${points.at(-1)!.value.toFixed(1)}%`} detail={`Real GDP, ${quarterLabel(points.at(-1)!.date)}`} />}
+        </Async>
         <Async state={inflation}>
           {(cpi) => <StatTile label="Inflation, year on year" value={cpi.yearOnYear === undefined ? "n/a" : `${cpi.yearOnYear.toFixed(1)}%`} detail={monthLabel(cpi.date)} />}
         </Async>
@@ -35,6 +40,9 @@ export function EconomyPanel({ rates, klci }: { rates: FetchState<Rates>; klci: 
           {(labour) => <StatTile label="Unemployment rate" value={`${labour.u_rate}%`} detail={monthLabel(labour.date)} />}
         </Async>
       </div>
+      <Async state={gdp}>
+        {(points) => <BarChart title="Real GDP growth, year on year, by quarter" points={points} format={(value) => `${value.toFixed(1)}%`} label={quarterLabel} />}
+      </Async>
       <Async state={klci}>{(points) => <Sparkline title="FBM KLCI, last month" points={points} format={(value) => value.toFixed(2)} />}</Async>
     </Panel>
   );
