@@ -1,6 +1,7 @@
 /// <reference types="vitest/config" />
 import { defineConfig, loadEnv, type Plugin, type ProxyOptions } from "vite";
 import react from "@vitejs/plugin-react";
+import { dataGovUrl } from "./api/gov";
 
 // The public APIs block browser requests from other origins (CORS), so the dev server forwards them.
 const forward = (target: string, prefix: string, headers?: Record<string, string>): ProxyOptions => ({
@@ -32,7 +33,8 @@ function dataGovMy(token?: string): Plugin {
     name: "data-gov-my",
     configureServer(server) {
       server.middlewares.use("/api/gov", async (request, response) => {
-        const url = `https://api.data.gov.my${request.url}`;
+        const [path, query = ""] = request.url!.split("?");
+        const url = dataGovUrl(path, query);
         let pending = cache.get(url);
         if (!pending || (await pending).expires < Date.now()) {
           pending = load(url);

@@ -10,8 +10,7 @@ async function request(url: string, init?: RequestInit) {
 
 const getJson = async <T>(url: string, init?: RequestInit): Promise<T> => (await request(url, init)).json();
 
-// data.gov.my needs the trailing slash before the query string, or it redirects to an empty reply.
-const catalogue = <T>(query: string) => getJson<T[]>(`/api/gov/data-catalogue/?${query}`);
+const catalogue = <T>(query: string) => getJson<T[]>(`/api/gov/data-catalogue?${query}`);
 
 export interface FuelPrice {
   date: string;
@@ -51,12 +50,12 @@ export async function fetchKlci(): Promise<Point[]> {
   });
 }
 
-export const fetchWeatherWarnings = async () => activeWarnings(await getJson<WeatherWarning[]>("/api/gov/weather/warning/?limit=50"));
+export const fetchWeatherWarnings = async () => activeWarnings(await getJson<WeatherWarning[]>("/api/gov/weather/warning?limit=50"));
 
 export const fetchFloodStations = () =>
-  getJson<FloodStation[]>("/api/gov/flood-warning/?include=station_name,district,state,water_level_indicator,water_level_update_datetime");
+  getJson<FloodStation[]>("/api/gov/flood-warning?include=station_name,district,state,water_level_indicator,water_level_update_datetime");
 
-export const fetchEarthquakes = () => getJson<Earthquake[]>("/api/gov/weather/warning/earthquake/?sort=-utcdatetime&limit=5");
+export const fetchEarthquakes = () => getJson<Earthquake[]>("/api/gov/weather/warning/earthquake?sort=-utcdatetime&limit=5");
 
 export async function fetchBloodDonations(): Promise<Point[]> {
   const rows = await catalogue<{ date: string; donations: number }>("id=blood_donations&filter=all@blood_type&sort=-date&limit=30");
