@@ -1,0 +1,62 @@
+/// <reference types="vitest/config" />
+import { defineConfig, loadEnv, type Plugin, type ProxyOptions } from "vite";
+import react from "@vitejs/plugin-react";
+
+// The public APIs block browser requests from other origins (CORS), so the dev server forwards them.
+const forward = (target: string, prefix: string, headers?: Record<string, string>): ProxyOptions => ({
+  target,
+  changeOrigin: true,
+  headers,
+  rewrite: (path) => path.replace(prefix, ""),
+});
+
+const tenMinutes = 10 * 60_000;
+
+// data.gov.my rate limits anonymous callers tightly, so replies are cached, identical requests share
+// one upstream call, and a 429 reply is retried after a pause. A token raises the limit.
+function dataGovMy(token?: string): Plugin {
+  const cache = new Map<string, Promise<{ status: number; body: string; expires: number }>>();
+  const headers: Record<string, string> = token ? { Authorization: `Token ${token}` } : {};
+
+  async function load(url: string) {
+    for (let attempt = 1; ; attempt++) {
+      const response = await fetch(url, { headers });
+      if (response.status !== 429 || attempt === 4) {
+        return { status: response.status, body: await response.text(), expires: Date.now() + tenMinutes };
+      }
+      await new Promise((resolve) => setTimeout(resolve, 20_000));
+    }
+  }
+
+  return {
+    name: "data-gov-my",
+    configureServer(server) {
+      server.middlewares.use("/api/gov", async (request, response) => {
+        const url = `https://api.data.gov.my${request.url}`;
+        let pending = cache.get(url);
+        if (!pending || (await pending).expires < Date.now()) {
+          pending = load(url);
+          cache.set(url, pending);
+        }
+        const reply = await pending;
+        if (reply.status !== 200) cache.delete(url);
+        response.statusCode = reply.status;
+        response.setHeader("Content-Type", "application/json");
+        response.end(reply.body);
+      });
+    },
+  };
+}
+
+export default defineConfig(({ mode }) => ({
+  plugins: [react(), dataGovMy(loadEnv(mode, process.cwd(), "").DATA_GOV_MY_TOKEN)],
+  server: {
+    proxy: {
+      "/api/bnm": forward("https://api.bnm.gov.my/public", "/api/bnm"),
+      "/api/news": forward("https://news.google.com/rss", "/api/news"),
+      "/api/air": forward("https://air-quality-api.open-meteo.com/v1", "/api/air"),
+      "/api/market": forward("https://query1.finance.yahoo.com/v8/finance", "/api/market", { "User-Agent": "Mozilla/5.0" }),
+    },
+  },
+  test: { environment: "jsdom" },
+}));
