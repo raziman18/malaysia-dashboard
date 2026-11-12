@@ -127,12 +127,27 @@ const newsFeeds = [
 
 export const newsOutlets = "Free Malaysia Today, Malay Mail, New Straits Times, Astro Awani, Utusan Malaysia, Sinar Harian";
 
-// Stories from the last 24 hours, newest first. One failing outlet does not hide the others.
-export async function fetchNews(): Promise<Headline[]> {
+export interface OutletResult {
+  name: string;
+  failedFeeds: number;
+  totalFeeds: number;
+  error?: string;
+}
+
+// Stories from the last 24 hours, newest first, and how each outlet's feeds did. One failing outlet does not hide
+// the others.
+export async function fetchNewsReport(): Promise<{ headlines: Headline[]; outlets: OutletResult[] }> {
   const feeds = await Promise.allSettled(newsFeeds.map(async ([outlet, url]) => parseRss(await (await request(url)).text(), outlet)));
   const loaded = feeds.flatMap((feed) => (feed.status === "fulfilled" ? feed.value : []));
   if (!loaded.length) throw new Error("No news outlet responded");
   const since = Date.now() - 86_400_000;
   const unique = new Map(loaded.filter((story) => story.published.getTime() >= since).map((story) => [story.link, story]));
-  return [...unique.values()].sort((a, b) => b.published.getTime() - a.published.getTime());
+  const outlets = [...new Set(newsFeeds.map(([outlet]) => outlet))].map((name) => {
+    const own = feeds.filter((_, index) => newsFeeds[index][0] === name);
+    const failed = own.filter((feed): feed is PromiseRejectedResult => feed.status === "rejected");
+    return { name, failedFeeds: failed.length, totalFeeds: own.length, error: (failed[0]?.reason as Error | undefined)?.message };
+  });
+  return { headlines: [...unique.values()].sort((a, b) => b.published.getTime() - a.published.getTime()), outlets };
 }
+
+export const fetchNews = async () => (await fetchNewsReport()).headlines;

@@ -6,7 +6,7 @@ import type { FetchState } from "../useFetch";
 
 // Shows when the panel's oldest feed last loaded, and says when a feed failed to refresh.
 export function Panel({ title, sources, feeds, children }: { title: string; sources: string; feeds: FetchState<unknown>[]; children: ReactNode }) {
-  const oldest = Math.min(...feeds.map((feed) => feed.checkedAt?.getTime() ?? 0));
+  const oldest = feeds.length ? Math.min(...feeds.map((feed) => feed.checkedAt?.getTime() ?? 0)) : 0;
   return (
     <section className="panel">
       <h2>{title}</h2>
