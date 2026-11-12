@@ -1,15 +1,21 @@
 import { useEffect, useState } from "react";
-import type { Headline, Tone } from "./lib/headlines";
+import type { Tone } from "./lib/headlines";
+import type { Topic } from "./lib/topics";
+
+export interface AiLabel {
+  tone: Tone;
+  topics: Topic[];
+}
 
 // Labels already fetched, kept for the whole visit. Each label is also cached by the browser and Vercel's CDN.
-const labels = new Map<string, Tone>();
+const labels = new Map<string, AiLabel>();
 let unavailable = false;
 const workers = 4;
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
-// Asks /api/tone for each headline without a label, a few at a time, and re-renders as labels arrive.
+// Asks /api/label for each headline without a label, a few at a time, and re-renders as labels arrive.
 // Stops for the visit if the server has no AI key, and backs off when Groq's rate limit is hit.
-export function useAiTones(headlines: Headline[] | undefined): Map<string, Tone> {
+export function useAiLabels(headlines: { title: string }[] | undefined): Map<string, AiLabel> {
   const [, setLabelCount] = useState(0);
 
   useEffect(() => {
@@ -20,9 +26,9 @@ export function useAiTones(headlines: Headline[] | undefined): Map<string, Tone>
     async function work() {
       while (active && !unavailable && pending.length) {
         const title = pending.shift()!;
-        const response = await fetch(`/api/tone?title=${encodeURIComponent(title)}`).catch(() => undefined);
+        const response = await fetch(`/api/label?title=${encodeURIComponent(title)}`).catch(() => undefined);
         if (response?.ok) {
-          labels.set(title, (await response.json()).tone);
+          labels.set(title, await response.json());
           if (active) setLabelCount(labels.size);
         } else if (response?.status === 503) {
           unavailable = true;

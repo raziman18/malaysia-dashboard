@@ -3,7 +3,7 @@ import { defineConfig, loadEnv, type Plugin, type ProxyOptions } from "vite";
 import react from "@vitejs/plugin-react";
 import { dataGovUrl } from "./api/gov";
 import { summarise } from "./api/summary";
-import { labelTone } from "./api/tone";
+import { labelHeadline } from "./api/label";
 
 // The public APIs block browser requests from other origins (CORS), so the dev server forwards them.
 const forward = (target: string, prefix: string, headers?: Record<string, string>): ProxyOptions => ({
@@ -52,9 +52,9 @@ function dataGovMy(token?: string): Plugin {
   };
 }
 
-// Serves the same /api/tone and /api/summary functions that Vercel runs.
+// Serves the same /api/label and /api/summary functions that Vercel runs.
 function aiRoutes(apiKey?: string): Plugin {
-  const routes = { "/api/tone": labelTone, "/api/summary": summarise };
+  const routes = { "/api/label": labelHeadline, "/api/summary": summarise };
   return {
     name: "ai-routes",
     configureServer(server) {

@@ -9,6 +9,14 @@ it("matches topics in the title or description", () => {
   expect(filterByTopic(stories, "flood").map((item) => item.title)).toEqual(["Banjir di Kelantan", "Residents moved"]);
 });
 
+it("prefers the AI's topics once a headline has them, except for Sabah and Sarawak", () => {
+  const houseArrest = { ...story("Najib's house arrest conditions set"), topics: ["politics" as const] };
+  const kuching = { ...story("Kuching hospital opens new wing"), topics: ["health" as const] };
+  expect(filterByTopic([houseArrest], "safety")).toEqual([]);
+  expect(filterByTopic([houseArrest], "politics")).toEqual([houseArrest]);
+  expect(filterByTopic([kuching], "borneo")).toEqual([kuching]);
+});
+
 it("matches party names as whole words only", () => {
   const stories = [story("PAS names Melaka candidates"), story("Passenger numbers rise at KLIA")];
   expect(filterByTopic(stories, "politics").map((item) => item.title)).toEqual(["PAS names Melaka candidates"]);

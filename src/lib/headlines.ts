@@ -1,3 +1,5 @@
+import type { Topic } from "./topics";
+
 export interface Headline {
   title: string;
   description: string;
@@ -5,8 +7,9 @@ export interface Headline {
   link: string;
   published: Date;
   image?: string;
-  // Set once the AI has labelled the headline. Until then the keyword guess is used.
+  // Set once the AI has labelled the headline. Until then keyword guesses are used.
   tone?: Tone;
+  topics?: Topic[];
 }
 
 export type Tone = "positive" | "negative" | "neutral";

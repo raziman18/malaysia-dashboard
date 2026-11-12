@@ -12,5 +12,9 @@ export const topics = {
 
 export type Topic = keyof typeof topics;
 
+// Uses the AI's topics once a headline has them. Sabah and Sarawak stay on place names, which the AI does not label.
 export const filterByTopic = (headlines: Headline[], topic: Topic) =>
-  headlines.filter((headline) => topics[topic].test(`${headline.title} ${headline.description}`));
+  headlines.filter((headline) => {
+    if (headline.topics && topic !== "borneo") return headline.topics.includes(topic);
+    return topics[topic].test(`${headline.title} ${headline.description}`);
+  });
