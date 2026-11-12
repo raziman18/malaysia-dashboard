@@ -1,8 +1,9 @@
 import { useState } from "react";
+import { newsFacts } from "../lib/facts";
 import { toneSummary, type Headline } from "../lib/headlines";
 import { filterByTopic, type Topic } from "../lib/topics";
 import type { FetchState } from "../useFetch";
-import { Async, HeadlineList, Panel } from "./ui";
+import { AiSummary, Async, HeadlineList, Panel } from "./ui";
 
 const tabs: { label: string; topic: Topic | null }[] = [
   { label: "All stories", topic: null },
@@ -16,6 +17,7 @@ export function NewsPanel({ news }: { news: FetchState<Headline[]> }) {
 
   return (
     <Panel title="News and sentiment" sources="Free Malaysia Today, Malay Mail, New Straits Times (last 24 hours). Tone labels come from an AI model on Groq; a ? marks a keyword guess.">
+      <AiSummary facts={news.data && newsFacts(news.data)} />
       <div className="tabs" role="tablist">
         {tabs.map((item) => (
           <button key={item.label} role="tab" aria-selected={item === tab} onClick={() => setTab(item)}>

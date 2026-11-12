@@ -2,6 +2,7 @@
 import { defineConfig, loadEnv, type Plugin, type ProxyOptions } from "vite";
 import react from "@vitejs/plugin-react";
 import { dataGovUrl } from "./api/gov";
+import { summarise } from "./api/summary";
 import { labelTone } from "./api/tone";
 
 // The public APIs block browser requests from other origins (CORS), so the dev server forwards them.
@@ -51,17 +52,20 @@ function dataGovMy(token?: string): Plugin {
   };
 }
 
-// Serves the same /api/tone function that Vercel runs.
-function toneLabels(apiKey?: string): Plugin {
+// Serves the same /api/tone and /api/summary functions that Vercel runs.
+function aiRoutes(apiKey?: string): Plugin {
+  const routes = { "/api/tone": labelTone, "/api/summary": summarise };
   return {
-    name: "tone-labels",
+    name: "ai-routes",
     configureServer(server) {
-      server.middlewares.use("/api/tone", async (request, response) => {
-        const reply = await labelTone(`http://localhost${request.originalUrl}`, apiKey);
-        response.statusCode = reply.status;
-        reply.headers.forEach((value, key) => response.setHeader(key, value));
-        response.end(await reply.text());
-      });
+      for (const [path, handle] of Object.entries(routes)) {
+        server.middlewares.use(path, async (request, response) => {
+          const reply = await handle(`http://localhost${request.originalUrl}`, apiKey);
+          response.statusCode = reply.status;
+          reply.headers.forEach((value, key) => response.setHeader(key, value));
+          response.end(await reply.text());
+        });
+      }
     },
   };
 }
@@ -69,7 +73,7 @@ function toneLabels(apiKey?: string): Plugin {
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), "");
   return {
-    plugins: [react(), dataGovMy(env.DATA_GOV_MY_TOKEN), toneLabels(env.GROQ_API_KEY)],
+    plugins: [react(), dataGovMy(env.DATA_GOV_MY_TOKEN), aiRoutes(env.GROQ_API_KEY)],
     server: {
       proxy: {
         "/api/bnm": forward("https://api.bnm.gov.my/public", "/api/bnm"),

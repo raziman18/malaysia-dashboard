@@ -30,3 +30,6 @@ export function useFetch<T>(load: (() => Promise<T>) | null, refreshMs = tenMinu
 
   return state;
 }
+
+// True once every feed has loaded or failed, so text built from them stops changing.
+export const isSettled = (...states: FetchState<unknown>[]) => states.every((state) => state.data !== undefined || state.error);

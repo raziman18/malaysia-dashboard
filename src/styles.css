@@ -470,3 +470,12 @@ figure {
   font-variant-numeric: tabular-nums;
   color: var(--text-primary);
 }
+
+.ai-summary {
+  display: grid;
+  gap: 4px;
+  margin: 0 0 16px;
+  padding: 10px 12px;
+  border-left: 3px solid var(--accent);
+  background: var(--surface);
+}
