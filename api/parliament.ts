@@ -160,12 +160,13 @@ const billCount = 8;
 
 export async function GET(): Promise<Response> {
   const today = new Date(Date.now() + 8 * 3_600_000).toISOString().slice(0, 10);
-  const [calendar, orderPapers, bills] = await Promise.all([
+  const pages = await Promise.all([
     fetchPage("takwim-dewan-rakyat.html?uweb=dr&lang=en"),
     fetchPage("aum-dewan-rakyat.html?uweb=dr&lang=en").catch(() => ""),
     fetchPage("bills-dewan-rakyat.html?uweb=dr&lang=en").catch(() => ""),
-  ]).catch(() => []);
-  if (!calendar) return json({ error: "parlimen.gov.my did not respond" }, 502);
+  ]).catch((error: Error) => error);
+  if (pages instanceof Error) return json({ error: `Could not read parlimen.gov.my: ${pages.message}` }, 502);
+  const [calendar, orderPapers, bills] = pages;
 
   // The meeting under way, or the next one this year.
   const meeting = parseMeetings(calendar).find((item) => item.end >= today);
@@ -173,8 +174,8 @@ export async function GET(): Promise<Response> {
   const parliament: Parliament = {
     meeting: meeting && { name: meeting.name, start: meeting.start, end: meeting.end },
     sittings,
-    orderPaper: parseOrderPaper(orderPapers ?? ""),
-    bills: parseBills(bills ?? "").slice(0, billCount),
+    orderPaper: parseOrderPaper(orderPapers),
+    bills: parseBills(bills).slice(0, billCount),
   };
   return json(parliament, 200, "public, s-maxage=3600, stale-while-revalidate=86400");
 }
