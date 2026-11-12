@@ -65,7 +65,7 @@ The site does not send its intermediate TLS certificate, so `scripts/parliament.
 
 ## Categories
 
-The sidebar (a row of buttons on phones) shows one panel at a time. The choice is kept in the address, such as `/#economy`, so a filtered view can be bookmarked or shared. "All" shows every panel with the daily brief and the most urgent items.
+The sidebar (a dropdown on phones and tablets) shows one panel at a time. The choice is kept in the address, such as `/#economy`, so a filtered view can be bookmarked or shared. "All" shows every panel with the daily brief and the most urgent items.
 
 ## Source health
 
