@@ -1,0 +1,13 @@
+# Temporary: checks whether GitHub's runners can reach parlimen.gov.my.
+name: Probe parliament
+on: workflow_dispatch
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - run: |
+          curl -s -o inter.crt http://crt.sectigo.com/SectigoPublicServerAuthenticationCADVR36.crt
+          openssl x509 -inform DER -in inter.crt -out inter.pem
+          cat /etc/ssl/certs/ca-certificates.crt inter.pem > bundle.pem
+          curl -s --cacert bundle.pem -A "Mozilla/5.0" --max-time 60 -o page.html -w "%{http_code} %{size_download} %{time_total}s\n" "https://www.parlimen.gov.my/takwim-dewan-rakyat.html?uweb=dr&lang=en" || echo "failed $?"
