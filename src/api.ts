@@ -93,14 +93,19 @@ export async function fetchAirQuality() {
 
 export const fetchBrief = () => getJson<Brief>("/api/brief");
 
-// These outlets publish a photo with each story, which Google News does not.
+// Most of these outlets publish a photo with each story, which Google News does not. The last three are in Malay.
 const newsFeeds = [
   ["Free Malaysia Today", "/api/fmt/category/nation/feed"],
   ["Free Malaysia Today", "/api/fmt/category/business/feed"],
   ["Malay Mail", "/api/malaymail/feed/rss/malaysia"],
   ["Malay Mail", "/api/malaymail/feed/rss/money"],
   ["New Straits Times", "/api/nst/feed"],
+  ["Astro Awani", "/api/awani/rss/national/public"],
+  ["Utusan Malaysia", "/api/utusan/category/nasional/feed/"],
+  ["Sinar Harian", "/api/sinar/rssFeed/211"],
 ];
+
+export const newsOutlets = "Free Malaysia Today, Malay Mail, New Straits Times, Astro Awani, Utusan Malaysia, Sinar Harian";
 
 // Stories from the last 24 hours, newest first. One failing outlet does not hide the others.
 export async function fetchNews(): Promise<Headline[]> {

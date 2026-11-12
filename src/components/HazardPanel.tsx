@@ -1,4 +1,4 @@
-import type { fetchAirQuality } from "../api";
+import { newsOutlets, type fetchAirQuality } from "../api";
 import { dayLabel, timeLabel } from "../lib/format";
 import { airQualityBand } from "../lib/status";
 import type { Headline } from "../lib/headlines";
@@ -24,7 +24,7 @@ export function HazardPanel({ warnings, air, stations, floodNews, summary }: Pro
   const radarUrl = `https://www.met.gov.my/data/radar_malaysia.gif?t=${radarStamp.data ?? ""}`;
 
   return (
-    <Panel title="Disasters and weather" sources="MET Malaysia and JPS via data.gov.my, MET Malaysia radar, Open-Meteo air quality, Free Malaysia Today, Malay Mail, New Straits Times" feeds={[warnings, air, stations, floodNews]}>
+    <Panel title="Disasters and weather" sources={`MET Malaysia and JPS via data.gov.my, MET Malaysia radar, Open-Meteo air quality, ${newsOutlets}`} feeds={[warnings, air, stations, floodNews]}>
       <AiSummary summary={summary} />
       <h3>Active weather warnings</h3>
       <Async state={warnings}>

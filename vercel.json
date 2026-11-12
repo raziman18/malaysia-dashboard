@@ -26,6 +26,18 @@
       "destination": "https://www.nst.com.my/:path*"
     },
     {
+      "source": "/api/awani/:path*",
+      "destination": "https://www.astroawani.com/:path*"
+    },
+    {
+      "source": "/api/utusan/:path*",
+      "destination": "https://www.utusan.com.my/:path*"
+    },
+    {
+      "source": "/api/sinar/:path*",
+      "destination": "https://www.sinarharian.com.my/:path*"
+    },
+    {
       "source": "/api/air/:path*",
       "destination": "https://air-quality-api.open-meteo.com/v1/:path*"
     },

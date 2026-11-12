@@ -40,7 +40,8 @@ export function parseRss(xml: string, outlet = ""): Headline[] {
     const source = tagText(item, "source") || outlet;
     const title = tagText(item, "title");
     const suffix = ` - ${source}`;
-    const image = item.match(/<media:(?:thumbnail|content)[^>]*\surl="([^"]+)"/)?.[1];
+    // A media tag or enclosure when there is one, otherwise the first photo in the description.
+    const image = (item.match(/<(?:media:thumbnail|media:content|enclosure)[^>]*\surl="([^"]+)"/) ?? item.match(/<img[^>]*\ssrc="([^"]+)"/))?.[1];
     return {
       title: source && title.endsWith(suffix) ? title.slice(0, -suffix.length) : title,
       description: tagText(item, "description"),

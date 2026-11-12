@@ -30,6 +30,17 @@ describe("parseRss", () => {
   });
 });
 
+describe("parseRss images", () => {
+  it("reads an enclosure, or the first photo in the description when there is no media tag", () => {
+    const item = (body: string) => `<rss><channel><item><title>A</title>${body}</item></channel></rss>`;
+    expect(parseRss(item('<enclosure  url="https://example.com/e.jpg" type="image/jpeg"/>'))[0].image).toBe("https://example.com/e.jpg");
+    expect(parseRss(item('<description><![CDATA[<div><img width="825" src="https://example.com/i.jpeg" alt=""></div><p>Text</p>]]></description>'))[0]).toMatchObject({
+      image: "https://example.com/i.jpeg",
+      description: "Text",
+    });
+  });
+});
+
 describe("headlineTone", () => {
   it("scores headlines by keyword", () => {
     expect(headlineTone("Flash floods hit Selangor")).toBe("negative");
