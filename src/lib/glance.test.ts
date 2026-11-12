@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { pickGlanceItems, type GlanceInputs } from "./glance";
+import { pickGlanceItems, urgentItems, type GlanceInputs } from "./glance";
 import type { Headline } from "./headlines";
 import type { Earthquake, FloodStation, WeatherWarning } from "./warnings";
 
@@ -53,5 +53,13 @@ describe("pickGlanceItems", () => {
     const items = pickGlanceItems(input, now);
     expect(items.map((item) => item.id)).toEqual(["klci", "weather", "headlines", "air"]);
     expect(items[0].value).toBe("-2.5%");
+  });
+});
+
+describe("urgentItems", () => {
+  it("is empty on a quiet day and lists only urgent items otherwise", () => {
+    expect(urgentItems(quietDay, now)).toEqual([]);
+    const input = { ...quietDay, air: [{ city: "Kuala Lumpur", aqi: 160 }], earthquakes: [quake(6.2, "1,282km SE Semporna,Sabah")] };
+    expect(urgentItems(input, now).map((item) => item.id)).toEqual(["air", "quake"]);
   });
 });

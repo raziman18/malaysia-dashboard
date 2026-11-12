@@ -17,6 +17,10 @@ npm test
 | Public health and safety | Daily blood donations, health and incident news, regional earthquakes | data.gov.my, news outlets |
 | News and sentiment | Stories with photos by topic, with a headline tone score | Free Malaysia Today, Malay Mail, New Straits Times |
 
+## Install and alerts
+
+The dashboard can be installed as an app from the browser menu ("Add to home screen" or "Install app"). "Turn on alerts" sends a notification for each new urgent item, using the same rules as the top four boxes (`urgentItems` in `src/lib/glance.ts`): very unhealthy air, rivers at warning or danger level, a strong nearby earthquake, or a KLCI move of 2% or more. Alerts arrive only while the dashboard is open, including in a background tab, because the site has no server that stores subscriptions. On iPhone, notifications work only after adding the dashboard to the home screen.
+
 ## Deploying
 
 The browser cannot call most of these APIs directly (CORS), so every request goes through `/api/...` paths.

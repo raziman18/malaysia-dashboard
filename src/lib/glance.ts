@@ -91,6 +91,10 @@ function candidates(input: GlanceInputs, now: Date): GlanceItem[] {
   return items;
 }
 
+// Items urgent enough to send an alert: very unhealthy air, rivers at warning or danger level, a strong nearby
+// earthquake, or a KLCI move of 2% or more.
+export const urgentItems = (input: GlanceInputs, now = new Date()) => candidates(input, now).filter((item) => item.priority >= 3);
+
 // Most urgent first. Sorting is stable, so ties keep the order above.
 export function pickGlanceItems(input: GlanceInputs, now = new Date(), count = 4): GlanceItem[] {
   return candidates(input, now).sort((a, b) => b.priority - a.priority).slice(0, count);
