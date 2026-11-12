@@ -1,10 +1,9 @@
 import type { fetchAirQuality } from "../api";
-import { hazardFacts } from "../lib/facts";
 import { dayLabel, timeLabel } from "../lib/format";
 import { airQualityBand } from "../lib/status";
 import type { Headline } from "../lib/headlines";
 import { isFeedFresh, latestStationUpdate, malaysiaTime, stationsAboveNormal, type FloodStation, type WeatherWarning } from "../lib/warnings";
-import { isSettled, useFetch, type FetchState } from "../useFetch";
+import { useFetch, type FetchState } from "../useFetch";
 import { AiSummary, Async, HeadlineList, Panel, StatusBadge } from "./ui";
 
 type AirReadings = Awaited<ReturnType<typeof fetchAirQuality>>;
@@ -14,21 +13,19 @@ interface Props {
   air: FetchState<AirReadings>;
   stations: FetchState<FloodStation[]>;
   floodNews: FetchState<Headline[]>;
+  summary?: string;
 }
 
 // A new timestamp every refresh makes the browser fetch the latest radar image.
 const loadRadarStamp = async () => Date.now();
 
-export function HazardPanel({ warnings, air, stations, floodNews }: Props) {
+export function HazardPanel({ warnings, air, stations, floodNews, summary }: Props) {
   const radarStamp = useFetch(loadRadarStamp);
-  const facts = isSettled(warnings, air, stations, floodNews)
-    ? hazardFacts({ warnings: warnings.data, air: air.data, stations: stations.data, floodNews: floodNews.data })
-    : undefined;
   const radarUrl = `https://www.met.gov.my/data/radar_malaysia.gif?t=${radarStamp.data ?? ""}`;
 
   return (
     <Panel title="Disasters and weather" sources="MET Malaysia and JPS via data.gov.my, MET Malaysia radar, Open-Meteo air quality, Free Malaysia Today, Malay Mail, New Straits Times">
-      <AiSummary facts={facts} />
+      <AiSummary summary={summary} />
       <h3>Active weather warnings</h3>
       <Async state={warnings}>
         {(list) =>

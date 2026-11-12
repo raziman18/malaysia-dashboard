@@ -1,11 +1,37 @@
 {
+  "functions": {
+    "api/brief.ts": {
+      "maxDuration": 60
+    }
+  },
   "rewrites": [
-    { "source": "/api/gov/:path*", "destination": "/api/gov?path=:path*" },
-    { "source": "/api/bnm/:path*", "destination": "https://api.bnm.gov.my/public/:path*" },
-    { "source": "/api/fmt/:path*", "destination": "https://cms.freemalaysiatoday.com/:path*" },
-    { "source": "/api/malaymail/:path*", "destination": "https://www.malaymail.com/:path*" },
-    { "source": "/api/nst/:path*", "destination": "https://www.nst.com.my/:path*" },
-    { "source": "/api/air/:path*", "destination": "https://air-quality-api.open-meteo.com/v1/:path*" },
-    { "source": "/api/market/:path*", "destination": "https://query1.finance.yahoo.com/v8/finance/:path*" }
+    {
+      "source": "/api/gov/:path*",
+      "destination": "/api/gov?path=:path*"
+    },
+    {
+      "source": "/api/bnm/:path*",
+      "destination": "https://api.bnm.gov.my/public/:path*"
+    },
+    {
+      "source": "/api/fmt/:path*",
+      "destination": "https://cms.freemalaysiatoday.com/:path*"
+    },
+    {
+      "source": "/api/malaymail/:path*",
+      "destination": "https://www.malaymail.com/:path*"
+    },
+    {
+      "source": "/api/nst/:path*",
+      "destination": "https://www.nst.com.my/:path*"
+    },
+    {
+      "source": "/api/air/:path*",
+      "destination": "https://air-quality-api.open-meteo.com/v1/:path*"
+    },
+    {
+      "source": "/api/market/:path*",
+      "destination": "https://query1.finance.yahoo.com/v8/finance/:path*"
+    }
   ]
 }

@@ -1,4 +1,4 @@
-import type { Headline } from "./headlines";
+import type { Headline } from "./headlines.js";
 
 // Keywords matched at the start of words in the title and description. English and common Malay terms.
 export const topics = {

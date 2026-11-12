@@ -1,12 +1,19 @@
 // Shared call to a model hosted on Groq that must answer with JSON matching a schema.
 // Vercel does not turn files whose names start with _ into functions. Import it as "./_groq.js", because
 // Vercel runs these files as ES modules, which need the extension.
+import { createHash } from "node:crypto";
 
 export const json = (body: unknown, status: number, cacheControl = "no-store") =>
   new Response(JSON.stringify(body), { status, headers: { "Content-Type": "application/json", "Cache-Control": cacheControl } });
 
 // Answers that never change for the same input, kept by the browser for a day and by Vercel's CDN for 30 days.
 export const keepForMonth = "public, max-age=86400, s-maxage=2592000, immutable";
+
+// Only the server knows this value, so only /api/brief can make /api/label and /api/summary call Groq.
+// Anyone can still read answers that Vercel's CDN has already cached.
+export const internalKey = (apiKey: string) => createHash("sha256").update(`dashboard-internal:${apiKey}`).digest("hex");
+
+export const isInternal = (request: Request, apiKey: string) => request.headers.get("x-internal-key") === internalKey(apiKey);
 
 // Groq sets rate limits per model, so routes on different models do not slow each other down.
 export async function askGroq(apiKey: string, model: string, system: string, user: string, schema: object, maxTokens: number) {

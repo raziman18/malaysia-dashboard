@@ -1,28 +1,23 @@
 import { fetchFuelPrice, fetchGdp, fetchInflation, fetchStateGdp, fetchUnemployment, type fetchExchangeRates } from "../api";
 import type { Point } from "../lib/economy";
-import { economyFacts } from "../lib/facts";
 import { dayLabel, monthLabel, quarterLabel, ringgit, ringgitBillions, signedPercent } from "../lib/format";
-import { isSettled, useFetch, type FetchState } from "../useFetch";
+import { useFetch, type FetchState } from "../useFetch";
 import { BarChart } from "./BarChart";
 import { Sparkline } from "./Sparkline";
 import { AiSummary, Async, Panel, StatTile } from "./ui";
 
 type Rates = Awaited<ReturnType<typeof fetchExchangeRates>>;
 
-export function EconomyPanel({ rates, klci }: { rates: FetchState<Rates>; klci: FetchState<Point[]> }) {
+export function EconomyPanel({ rates, klci, summary }: { rates: FetchState<Rates>; klci: FetchState<Point[]>; summary?: string }) {
   const fuel = useFetch(fetchFuelPrice);
   const inflation = useFetch(fetchInflation);
   const unemployment = useFetch(fetchUnemployment);
   const gdp = useFetch(fetchGdp);
   const stateGdp = useFetch(fetchStateGdp);
-  const settled = isSettled(rates, klci, fuel, inflation, unemployment, gdp, stateGdp);
-  const facts = settled
-    ? economyFacts({ rates: rates.data, fuel: fuel.data, gdp: gdp.data, inflation: inflation.data, unemployment: unemployment.data, stateGdp: stateGdp.data, klci: klci.data })
-    : undefined;
 
   return (
     <Panel title="Economy" sources="Bank Negara Malaysia, data.gov.my (DOSM, Ministry of Finance; real GDP at constant 2015 prices), Yahoo Finance (unofficial)">
-      <AiSummary facts={facts} />
+      <AiSummary summary={summary} />
       <div className="tiles">
         <Async state={rates}>
           {(list) => list.map((rate) => (

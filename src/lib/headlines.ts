@@ -1,4 +1,4 @@
-import type { Topic } from "./topics";
+import type { Topic } from "./topics.js";
 
 export interface Headline {
   title: string;
@@ -14,22 +14,40 @@ export interface Headline {
 
 export type Tone = "positive" | "negative" | "neutral";
 
+const entities: Record<string, string> = {
+  amp: "&", lt: "<", gt: ">", quot: '"', apos: "'", nbsp: " ", mdash: "\u2014", ndash: "\u2013",
+  lsquo: "\u2018", rsquo: "\u2019", ldquo: "\u201c", rdquo: "\u201d", hellip: "\u2026",
+};
+
+const decode = (text: string) =>
+  text.replace(/&(#x[0-9a-f]+|#\d+|\w+);/gi, (match, code: string) => {
+    if (code[0] !== "#") return entities[code.toLowerCase()] ?? match;
+    return String.fromCodePoint(code[1].toLowerCase() === "x" ? Number.parseInt(code.slice(2), 16) : Number(code.slice(1)));
+  });
+
+// Text inside the first <tag>, without CDATA wrappers or HTML tags.
+function tagText(xml: string, tag: string) {
+  const match = xml.match(new RegExp(`<${tag}(?:\\s[^>]*)?>([\\s\\S]*?)</${tag}>`));
+  const inner = (match?.[1] ?? "").replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, "$1");
+  // Some feeds escape the HTML in descriptions, so tags are removed again after decoding.
+  return decode(inner.replace(/<[^>]+>/g, "")).replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim();
+}
+
+// A small regular-expression parser rather than DOMParser, so the same code runs in the browser and on the server.
 // Feeds without a <source> tag take the outlet name passed in.
 export function parseRss(xml: string, outlet = ""): Headline[] {
-  const document = new DOMParser().parseFromString(xml, "text/xml");
-  return [...document.querySelectorAll("item")].map((item) => {
-    const text = (tag: string) => item.getElementsByTagName(tag)[0]?.textContent?.trim() ?? "";
-    const source = text("source") || outlet;
-    const title = text("title");
+  return (xml.match(/<item[\s>][\s\S]*?<\/item>/g) ?? []).map((item) => {
+    const source = tagText(item, "source") || outlet;
+    const title = tagText(item, "title");
     const suffix = ` - ${source}`;
-    const media = item.getElementsByTagName("media:thumbnail")[0] ?? item.getElementsByTagName("media:content")[0];
+    const image = item.match(/<media:(?:thumbnail|content)[^>]*\surl="([^"]+)"/)?.[1];
     return {
       title: source && title.endsWith(suffix) ? title.slice(0, -suffix.length) : title,
-      description: new DOMParser().parseFromString(text("description"), "text/html").body.textContent ?? "",
+      description: tagText(item, "description"),
       source,
-      link: text("link"),
-      published: new Date(text("pubDate")),
-      image: media?.getAttribute("url") ?? undefined,
+      link: tagText(item, "link"),
+      published: new Date(tagText(item, "pubDate")),
+      image: image && decode(image),
     };
   });
 }

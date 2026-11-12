@@ -1,7 +1,7 @@
 // Vercel function that labels one headline's tone and topics with a model hosted on Groq. Each headline has its
 // own URL, /api/label?title=..., and Vercel's CDN keeps the answer for 30 days, so a headline is labelled once
 // however many people open the dashboard. That keeps usage inside Groq's free daily token limit.
-import { askGroq, json, keepForMonth } from "./_groq.js";
+import { askGroq, json, isInternal, keepForMonth } from "./_groq.js";
 
 const tones = ["positive", "neutral", "negative"];
 // Sabah and Sarawak stories are still found by place names, which keywords match reliably.
@@ -33,9 +33,10 @@ const schema = {
   additionalProperties: false,
 };
 
-export async function labelHeadline(requestUrl: string, apiKey: string | undefined): Promise<Response> {
-  const title = new URL(requestUrl).searchParams.get("title")?.trim() ?? "";
+export async function labelHeadline(request: Request, apiKey: string | undefined): Promise<Response> {
+  const title = new URL(request.url).searchParams.get("title")?.trim() ?? "";
   if (!apiKey) return json({ error: "GROQ_API_KEY is not set" }, 503);
+  if (!isInternal(request, apiKey)) return json({ error: "Only /api/brief can call this route" }, 403);
   if (!title || title.length > 300) return json({ error: "Expected a headline of 1 to 300 characters" }, 400);
 
   const { reply, status = 502, error = "Groq returned an unexpected reply" } = await askGroq(apiKey, "openai/gpt-oss-20b", instructions, title, schema, 500);
@@ -45,4 +46,4 @@ export async function labelHeadline(requestUrl: string, apiKey: string | undefin
   return json({ error }, status);
 }
 
-export const GET = (request: Request) => labelHeadline(request.url, process.env.GROQ_API_KEY);
+export const GET = (request: Request) => labelHeadline(request, process.env.GROQ_API_KEY);

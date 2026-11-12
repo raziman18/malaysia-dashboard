@@ -30,18 +30,19 @@ Set these in `.env.local` for local development and in the Vercel project settin
 
 | Name | Used for |
 |---|---|
-| `GROQ_API_KEY` | AI headline tone and topic labels (`api/label.ts`) and panel summaries (`api/summary.ts`). Get a free key at console.groq.com. Without it, tone falls back to keyword guesses and the summaries are hidden. |
+| `GROQ_API_KEY` | AI headline labels and summaries (`api/brief.ts`). Get a free key at console.groq.com. Without it, tone falls back to keyword guesses and the summaries are hidden. |
 | `DATA_GOV_MY_TOKEN` | Raises the data.gov.my rate limit. |
 
-## Headline tone
+## AI labels and summaries
 
-`api/label.ts` asks a Groq-hosted model (`openai/gpt-oss-20b`) to label each headline positive, neutral or negative, and to list its topics (flood, health, safety, economy, politics), using the same guide as the hand-labelled test set in `src/lib/fixtures/headline-tone.txt`. Each headline has its own URL and Vercel's CDN keeps the label for 30 days, so a headline is labelled once however many people visit. That keeps usage inside Groq's free daily token limit. Until a label arrives, the dashboard shows the keyword guess marked with a `?` and sorts the story into topics by keywords. Sabah and Sarawak stories are always found by place names.
+`api/brief.ts` prepares everything the AI adds, and the browser loads it in one request:
 
-On the 89 hand-labelled headlines, the AI labelled 83% and 88% correctly in two runs. The keyword method scores 56%, and labelling everything neutral would score 62%.
+- **Labels.** Each current headline gets a tone (positive, neutral or negative) and its topics (flood, health, safety, economy, politics) from `api/label.ts`, which uses `openai/gpt-oss-20b` on Groq and the same guide as the hand-labelled test set in `src/lib/fixtures/headline-tone.txt`. Until a label arrives, the dashboard shows the keyword guess marked with a `?` and sorts the story into topics by keywords. Sabah and Sarawak stories are always found by place names.
+- **Summaries.** The brief builds plain-text facts for each panel from the same public feeds (`src/lib/facts.ts`), and `api/summary.ts` asks `openai/gpt-oss-120b` to summarise only those facts. A daily brief at the top summarises all panels together. Summaries can still contain mistakes, and the page says so.
 
-## AI summaries
+Only `/api/brief` can make the label and summary routes call Groq (it sends a key derived from `GROQ_API_KEY`), so visitors cannot spend the free quota on their own text. Each headline and each set of facts has its own URL, and Vercel's CDN keeps those answers for 30 days, so nothing is sent to Groq twice. The brief itself is kept for 30 minutes, or 2 minutes while some labels are still missing.
 
-Each panel opens with a two or three sentence summary. The panel turns its data into plain-text facts (`src/lib/facts.ts`) and `api/summary.ts` asks the same Groq model to summarise only those facts. The facts are part of the URL, so Vercel's CDN reuses a summary until the data behind it changes. Summaries can still contain mistakes, and the panel says so.
+On the 89 hand-labelled headlines, the AI labelled 83% and 88% of tones correctly in two runs. The keyword method scores 56%, and labelling everything neutral would score 62%.
 
 ## Known limits
 
@@ -50,4 +51,4 @@ Each panel opens with a two or three sentence summary. The panel turns its data 
 - The JPS river level feed on data.gov.my stopped updating in February 2024. The dashboard detects this and shows flood news instead.
 - Yahoo Finance's chart API is unofficial and may change.
 - Headline tone describes what each story reports. It is not a survey of public opinion.
-- Anyone who finds `/api/label` or `/api/summary` can spend the Groq free quota by sending made-up headlines. The free tier has no charges, but labelling would pause until the daily limit resets.
+- Groq's free tier limits tokens per day. On a very busy news day, labels or summaries can pause until the limit resets, and the dashboard falls back to keyword guesses.

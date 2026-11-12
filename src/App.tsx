@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
-import { fetchAirQuality, fetchEarthquakes, fetchExchangeRates, fetchFloodStations, fetchKlci, fetchNews, fetchWeatherWarnings } from "./api";
+import { fetchAirQuality, fetchBrief, fetchEarthquakes, fetchExchangeRates, fetchFloodStations, fetchKlci, fetchNews, fetchWeatherWarnings } from "./api";
 import { EconomyPanel } from "./components/EconomyPanel";
 import { GlanceStrip } from "./components/GlanceStrip";
 import { HazardPanel } from "./components/HazardPanel";
 import { HealthSafetyPanel } from "./components/HealthSafetyPanel";
 import { NewsPanel } from "./components/NewsPanel";
+import { AiSummary } from "./components/ui";
 import { filterByTopic } from "./lib/topics";
-import { useAiLabels } from "./useAiLabels";
 import { useFetch } from "./useFetch";
 
 const selectUsdRate = (rates: Awaited<ReturnType<typeof fetchExchangeRates>>) => rates.find((rate) => rate.code === "USD")?.ringgit;
@@ -16,8 +16,9 @@ export function App() {
   const air = useFetch(fetchAirQuality);
   const rates = useFetch(fetchExchangeRates);
   const loadedNews = useFetch(fetchNews);
-  const labels = useAiLabels(loadedNews.data);
-  const news = { ...loadedNews, data: loadedNews.data?.map((headline) => ({ ...headline, ...labels.get(headline.title) })) };
+  const brief = useFetch(fetchBrief);
+  const summaries = brief.data?.summaries ?? {};
+  const news = { ...loadedNews, data: loadedNews.data?.map((headline) => ({ ...headline, ...brief.data?.labels[headline.title] })) };
   const floodNews = { ...news, data: news.data && filterByTopic(news.data, "flood") };
   const floodStations = useFetch(fetchFloodStations);
   const earthquakes = useFetch(fetchEarthquakes);
@@ -40,6 +41,7 @@ export function App() {
           {now.toLocaleString("en-MY", { weekday: "long", day: "numeric", month: "long", hour: "2-digit", minute: "2-digit", timeZone: "Asia/Kuala_Lumpur" })} MYT
         </time>
       </header>
+      <AiSummary title="Today's brief" summary={summaries.daily} />
       <GlanceStrip
         warnings={warnings}
         air={air}
@@ -51,10 +53,10 @@ export function App() {
         klci={klci}
       />
       <div className="grid">
-        <HazardPanel warnings={warnings} air={air} stations={floodStations} floodNews={floodNews} />
-        <EconomyPanel rates={rates} klci={klci} />
-        <HealthSafetyPanel earthquakes={earthquakes} news={news} />
-        <NewsPanel news={news} />
+        <HazardPanel warnings={warnings} air={air} stations={floodStations} floodNews={floodNews} summary={summaries.hazards} />
+        <EconomyPanel rates={rates} klci={klci} summary={summaries.economy} />
+        <HealthSafetyPanel earthquakes={earthquakes} news={news} summary={summaries.health} />
+        <NewsPanel news={news} summary={summaries.news} />
       </div>
     </main>
   );

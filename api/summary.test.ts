@@ -1,7 +1,9 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { internalKey } from "./_groq";
 import { summarise } from "./summary";
 
-const url = (facts: string) => `https://site.app/api/summary?facts=${encodeURIComponent(facts)}`;
+const url = (facts: string, headers: HeadersInit = { "x-internal-key": internalKey("key") }) =>
+  new Request(`https://site.app/api/summary?facts=${encodeURIComponent(facts)}`, { headers });
 const groqReply = (content: string, status = 200) =>
   vi.spyOn(globalThis, "fetch").mockResolvedValue(new Response(JSON.stringify({ choices: [{ message: { content } }] }), { status }));
 
@@ -17,11 +19,18 @@ describe("summarise", () => {
     expect(body.messages[1].content).toBe("Panel: Economy\nInflation: 1.2%");
   });
 
+  it("refuses callers other than /api/brief, without calling Groq", async () => {
+    const fetchSpy = vi.spyOn(globalThis, "fetch");
+    expect((await summarise(url("Floods", {}), "key")).status).toBe(403);
+    expect((await summarise(url("Floods", { "x-internal-key": internalKey("other") }), "key")).status).toBe(403);
+    expect(fetchSpy).not.toHaveBeenCalled();
+  });
+
   it("refuses without a key or with bad facts, without calling Groq", async () => {
     const fetchSpy = vi.spyOn(globalThis, "fetch");
     expect((await summarise(url("Panel: News"), undefined)).status).toBe(503);
     expect((await summarise(url(" "), "key")).status).toBe(400);
-    expect((await summarise(url("x".repeat(4001)), "key")).status).toBe(400);
+    expect((await summarise(url("x".repeat(8001)), "key")).status).toBe(400);
     expect(fetchSpy).not.toHaveBeenCalled();
   });
 

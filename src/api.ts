@@ -1,9 +1,16 @@
-import { joinGdpSeries, stateGdpShares, yearOnYearChange, type Point } from "./lib/economy";
-import { parseRss, type Headline } from "./lib/headlines";
-import { activeWarnings, type Earthquake, type FloodStation, type WeatherWarning } from "./lib/warnings";
+import { joinGdpSeries, stateGdpShares, yearOnYearChange, type Point } from "./lib/economy.js";
+import { parseRss, type Headline } from "./lib/headlines.js";
+import type { Brief } from "../api/brief.js";
+import { activeWarnings, type Earthquake, type FloodStation, type WeatherWarning } from "./lib/warnings.js";
+
+// Empty in the browser. The server sets its own address, because Node cannot fetch relative URLs.
+let base = "";
+export const setApiBase = (url: string) => {
+  base = url;
+};
 
 async function request(url: string, init?: RequestInit) {
-  const response = await fetch(url, init);
+  const response = await fetch(base + url, init);
   if (!response.ok) throw new Error(`Source returned ${response.status}`);
   return response;
 }
@@ -83,6 +90,8 @@ export async function fetchAirQuality() {
   const readings = await getJson<{ current: { us_aqi: number } }[]>(`/api/air/air-quality?latitude=${latitudes}&longitude=${longitudes}&current=us_aqi`);
   return stateCapitals.map(([city], index) => ({ city, aqi: readings[index].current.us_aqi })).sort((a, b) => b.aqi - a.aqi);
 }
+
+export const fetchBrief = () => getJson<Brief>("/api/brief");
 
 // These outlets publish a photo with each story, which Google News does not.
 const newsFeeds = [

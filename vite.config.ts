@@ -2,8 +2,9 @@
 import { defineConfig, loadEnv, type Plugin, type ProxyOptions } from "vite";
 import react from "@vitejs/plugin-react";
 import { dataGovUrl } from "./api/gov";
-import { summarise } from "./api/summary";
+import { buildBrief } from "./api/brief";
 import { labelHeadline } from "./api/label";
+import { summarise } from "./api/summary";
 
 // The public APIs block browser requests from other origins (CORS), so the dev server forwards them.
 const forward = (target: string, prefix: string, headers?: Record<string, string>): ProxyOptions => ({
@@ -52,15 +53,16 @@ function dataGovMy(token?: string): Plugin {
   };
 }
 
-// Serves the same /api/label and /api/summary functions that Vercel runs.
+// Serves the same /api/brief, /api/label and /api/summary functions that Vercel runs.
 function aiRoutes(apiKey?: string): Plugin {
-  const routes = { "/api/label": labelHeadline, "/api/summary": summarise };
+  const routes = { "/api/brief": buildBrief, "/api/label": labelHeadline, "/api/summary": summarise };
   return {
     name: "ai-routes",
     configureServer(server) {
       for (const [path, handle] of Object.entries(routes)) {
         server.middlewares.use(path, async (request, response) => {
-          const reply = await handle(`http://localhost${request.originalUrl}`, apiKey);
+          const headers = new Headers(Object.entries(request.headers).map(([key, value]): [string, string] => [key, String(value)]));
+          const reply = await handle(new Request(`http://${request.headers.host}${request.originalUrl}`, { headers }), apiKey);
           response.statusCode = reply.status;
           reply.headers.forEach((value, key) => response.setHeader(key, value));
           response.end(await reply.text());

@@ -2,7 +2,6 @@ import type { ReactNode } from "react";
 import { toneOf, type Headline } from "../lib/headlines";
 import { timeLabel } from "../lib/format";
 import type { Status } from "../lib/status";
-import { useAiSummary } from "../useAiSummary";
 import type { FetchState } from "../useFetch";
 
 export function Panel({ title, sources, children }: { title: string; sources: string; children: ReactNode }) {
@@ -15,13 +14,12 @@ export function Panel({ title, sources, children }: { title: string; sources: st
   );
 }
 
-// Shows nothing until a summary arrives, so the panel looks the same without an AI key.
-export function AiSummary({ facts }: { facts?: string }) {
-  const summary = useAiSummary(facts);
+// Shows nothing until a summary arrives, so the page looks the same without an AI key.
+export function AiSummary({ summary, title = "Summary" }: { summary?: string; title?: string }) {
   if (!summary) return null;
   return (
     <p className="ai-summary">
-      <span className="tile-label">AI summary, may contain mistakes</span>
+      <span className="tile-label">{title}, written by AI and may contain mistakes</span>
       {summary}
     </p>
   );

@@ -1,7 +1,9 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { internalKey } from "./_groq";
 import { labelHeadline } from "./label";
 
-const url = (title: string) => `https://site.app/api/label?title=${encodeURIComponent(title)}`;
+const url = (title: string, headers: HeadersInit = { "x-internal-key": internalKey("key") }) =>
+  new Request(`https://site.app/api/label?title=${encodeURIComponent(title)}`, { headers });
 const groqReply = (content: string, status = 200) =>
   vi.spyOn(globalThis, "fetch").mockResolvedValue(new Response(JSON.stringify({ choices: [{ message: { content } }] }), { status }));
 
@@ -15,6 +17,13 @@ describe("labelHeadline", () => {
     expect(response.headers.get("Cache-Control")).toContain("s-maxage=2592000");
     const body = JSON.parse(fetchSpy.mock.calls[0][1]!.body as string);
     expect(body.messages[1].content).toBe("More than 1,300 displaced as floods worsen");
+  });
+
+  it("refuses callers other than /api/brief, without calling Groq", async () => {
+    const fetchSpy = vi.spyOn(globalThis, "fetch");
+    expect((await labelHeadline(url("Floods", {}), "key")).status).toBe(403);
+    expect((await labelHeadline(url("Floods", { "x-internal-key": internalKey("other") }), "key")).status).toBe(403);
+    expect(fetchSpy).not.toHaveBeenCalled();
   });
 
   it("refuses without a key or with a bad title, without calling Groq", async () => {

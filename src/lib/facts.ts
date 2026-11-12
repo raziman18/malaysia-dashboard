@@ -1,10 +1,10 @@
-import type { FuelPrice } from "../api";
-import { percentChange, type GdpQuarter, type Point, type StateGdp } from "./economy";
-import { dayLabel, monthLabel, quarterLabel, ringgit, ringgitBillions, signedPercent, timeLabel } from "./format";
-import type { Headline } from "./headlines";
-import { airQualityBand } from "./status";
-import { filterByTopic } from "./topics";
-import { isFeedFresh, malaysiaTime, stationsAboveNormal, type Earthquake, type FloodStation, type WeatherWarning } from "./warnings";
+import type { FuelPrice } from "../api.js";
+import { percentChange, type GdpQuarter, type Point, type StateGdp } from "./economy.js";
+import { dayLabel, monthLabel, quarterLabel, ringgit, ringgitBillions, signedPercent, timeLabel } from "./format.js";
+import type { Headline } from "./headlines.js";
+import { airQualityBand } from "./status.js";
+import { filterByTopic } from "./topics.js";
+import { isFeedFresh, malaysiaTime, stationsAboveNormal, type Earthquake, type FloodStation, type WeatherWarning } from "./warnings.js";
 
 // Plain-text facts that the AI summarises for each panel. The text is also the cache key for /api/summary,
 // so it holds only values that change when the underlying data changes, never the current time.
