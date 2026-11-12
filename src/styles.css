@@ -279,16 +279,22 @@ ul {
   gap: 12px;
 }
 
+/* Columns follow the panel's width, which depends on the sidebar and the number of panels shown. */
 .air {
   display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(340px, 100%), 1fr));
   column-gap: 24px;
 }
 
+/* A long label such as "Unhealthy for sensitive groups" drops below the number instead of overflowing. */
 .air-value {
   display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
   align-items: center;
-  gap: 8px;
-  white-space: nowrap;
+  gap: 2px 8px;
+  min-width: 0;
+  text-align: right;
 }
 
 .air-value strong {
@@ -479,10 +485,6 @@ figure {
   .glance {
     grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 16px;
-  }
-
-  .air {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .headlines img {
