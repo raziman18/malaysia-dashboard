@@ -83,7 +83,8 @@ export default defineConfig(({ mode }) => {
         "/api/malaymail": forward("https://www.malaymail.com", "/api/malaymail", { "User-Agent": "Mozilla/5.0" }),
         "/api/nst": forward("https://www.nst.com.my", "/api/nst", { "User-Agent": "Mozilla/5.0" }),
         "/api/awani": forward("https://www.astroawani.com", "/api/awani", { "User-Agent": "Mozilla/5.0" }),
-        "/api/utusan": forward("https://www.utusan.com.my", "/api/utusan", { "User-Agent": "Mozilla/5.0" }),
+        // Vercel rewrites skip paths ending in "/", so this WordPress feed gets a fixed path.
+        "/api/utusan-nasional": forward("https://www.utusan.com.my/category/nasional/feed/", "/api/utusan-nasional", { "User-Agent": "Mozilla/5.0" }),
         "/api/sinar": forward("https://www.sinarharian.com.my", "/api/sinar", { "User-Agent": "Mozilla/5.0" }),
         "/api/air": forward("https://air-quality-api.open-meteo.com/v1", "/api/air"),
         "/api/market": forward("https://query1.finance.yahoo.com/v8/finance", "/api/market", { "User-Agent": "Mozilla/5.0" }),

@@ -101,7 +101,7 @@ const newsFeeds = [
   ["Malay Mail", "/api/malaymail/feed/rss/money"],
   ["New Straits Times", "/api/nst/feed"],
   ["Astro Awani", "/api/awani/rss/national/public"],
-  ["Utusan Malaysia", "/api/utusan/category/nasional/feed/"],
+  ["Utusan Malaysia", "/api/utusan-nasional"],
   ["Sinar Harian", "/api/sinar/rssFeed/211"],
 ];
 
