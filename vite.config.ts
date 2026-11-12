@@ -4,6 +4,7 @@ import react from "@vitejs/plugin-react";
 import { dataGovUrl } from "./api/gov";
 import { buildBrief } from "./api/brief";
 import { labelHeadline } from "./api/label";
+import { GET as parliament } from "./api/parliament";
 import { GET as staplePrices } from "./api/prices";
 import { summarise } from "./api/summary";
 
@@ -55,9 +56,9 @@ function dataGovMy(token?: string): Plugin {
   };
 }
 
-// Serves the same /api/brief, /api/label, /api/summary and /api/prices functions that Vercel runs.
+// Serves the same functions that Vercel runs from the api folder.
 function aiRoutes(apiKey?: string): Plugin {
-  const routes = { "/api/brief": buildBrief, "/api/label": labelHeadline, "/api/summary": summarise, "/api/prices": staplePrices };
+  const routes = { "/api/brief": buildBrief, "/api/label": labelHeadline, "/api/summary": summarise, "/api/prices": staplePrices, "/api/parliament": parliament };
   return {
     name: "ai-routes",
     configureServer(server) {

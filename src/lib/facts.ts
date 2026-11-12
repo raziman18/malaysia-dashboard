@@ -1,8 +1,10 @@
+import type { Parliament } from "../../api/parliament.js";
 import type { StaplePrice } from "../../api/prices.js";
 import type { FuelPrice } from "../api.js";
 import { percentChange, type GdpQuarter, type Point, type StateGdp } from "./economy.js";
 import { dayLabel, monthLabel, priceChangeLabel, quarterLabel, ringgit, ringgitBillions, ringgitChange, signedPercent, timeLabel } from "./format.js";
 import type { Headline } from "./headlines.js";
+import { sittingOutlook, sittingSummary } from "./parliament.js";
 import { airQualityBand } from "./status.js";
 import { filterByTopic } from "./topics.js";
 import { isFeedFresh, malaysiaTime, stationsAboveNormal, type Earthquake, type FloodStation, type WeatherWarning } from "./warnings.js";
@@ -99,3 +101,15 @@ export function healthFacts({ blood, news, earthquakes }: HealthData): string {
 }
 
 export const newsFacts = (news: Headline[]) => ["Panel: News", ...headlineLines("Top stories, last 24 hours, newest first", news, 15)].join("\n");
+
+export function parliamentFacts(parliament: Parliament | undefined, news: Headline[] | undefined, today: string): string {
+  const lines = ["Panel: Parliament and Cabinet", `Today is ${today}.`];
+  if (parliament) {
+    lines.push(sittingSummary(parliament, today));
+    const next = sittingOutlook(parliament.sittings, today, 1).upcoming[0];
+    if (next) lines.push(`Next sitting: ${next.date}, ${next.business}`);
+    lines.push("Recent bills:", ...parliament.bills.slice(0, 5).map((bill) => `- ${bill.title}: ${bill.status}${bill.presenter ? `, presented by ${bill.presenter}` : ""}`));
+  }
+  if (news) lines.push(...headlineLines("Cabinet news", filterByTopic(news, "cabinet")));
+  return lines.join("\n");
+}

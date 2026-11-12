@@ -16,6 +16,7 @@ npm test
 | Economy | Exchange rates, fuel prices and their weekly change, staple food prices, GDP, inflation, unemployment, FBM KLCI | Bank Negara Malaysia, data.gov.my, PriceCatcher (`api/prices.ts`), Yahoo Finance |
 | Public health and safety | Daily blood donations, health and incident news, regional earthquakes | data.gov.my, news outlets |
 | News and sentiment | Stories with photos by topic, with a headline tone score | Free Malaysia Today, Malay Mail, New Straits Times, Astro Awani, Utusan Malaysia, Sinar Harian |
+| Parliament and Cabinet | Whether the Dewan Rakyat sits today, upcoming sittings, the latest order paper, recent bills, and Cabinet news | parlimen.gov.my (`api/parliament.ts`), news outlets |
 
 ## State map
 
@@ -55,6 +56,10 @@ Set these in `.env.local` for local development and in the Vercel project settin
 Only `/api/brief` can make the label and summary routes call Groq (it sends a key derived from `GROQ_API_KEY`), so visitors cannot spend the free quota on their own text. Each headline and each set of facts has its own URL, and Vercel's CDN keeps those answers for 30 days, so nothing is sent to Groq twice. The brief itself is kept for 30 minutes, or 2 minutes while some labels are still missing.
 
 On the 89 hand-labelled headlines, the AI labelled 83% and 88% of tones correctly in two runs. The keyword method scores 56%, and labelling everything neutral would score 62%.
+
+## Parliament
+
+`api/parliament.ts` reads the Dewan Rakyat calendar, order paper list and bills from parlimen.gov.my, which has no API, and Vercel's CDN keeps the result for an hour. The site does not send its intermediate TLS certificate, so the function supplies Sectigo's public intermediate and still verifies the connection fully. If the site changes its page layout, the parsers in that file need updating (their tests use trimmed copies of the real pages). The Cabinet does not publish meeting dates or decisions as data, so the panel shows Cabinet news instead.
 
 ## Known limits
 

@@ -8,13 +8,17 @@ export const topics = {
   economy: /\b(econom|ringgit|Bursa|inflation|GDP|trade|invest|export|budget|subsid|price|tariff)/i,
   politics: /\b(parliament|Dewan|cabinet|minister|Anwar|PKR|UMNO|PAS\b|Bersatu|DAP|Pakatan|Perikatan|Barisan|election|MPs?\b|assemblyman|state assembly|pilihan raya)/i,
   borneo: /\b(Sabah|Sarawak|Kota Kinabalu|Kuching|Labuan|Sandakan|Miri)/i,
+  cabinet: /\b(Cabinet|Kabinet|Jemaah Menteri|reshuffle|rombakan)\b/i,
 };
+
+// Topics the AI labels. The others are always found by keywords: places, and the narrow Cabinet topic.
+const aiTopics = new Set<Topic>(["flood", "health", "safety", "economy", "politics"]);
 
 export type Topic = keyof typeof topics;
 
-// Uses the AI's topics once a headline has them. Sabah and Sarawak stay on place names, which the AI does not label.
+// Uses the AI's topics once a headline has them.
 export const filterByTopic = (headlines: Headline[], topic: Topic) =>
   headlines.filter((headline) => {
-    if (headline.topics && topic !== "borneo") return headline.topics.includes(topic);
+    if (headline.topics && aiTopics.has(topic)) return headline.topics.includes(topic);
     return topics[topic].test(`${headline.title} ${headline.description}`);
   });

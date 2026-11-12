@@ -535,3 +535,18 @@ figure {
 .state-issues span span {
   display: block;
 }
+
+.bill-detail {
+  display: block;
+  font-size: 0.85rem;
+}
+
+.bill-status {
+  flex: none;
+  font-size: 0.85rem;
+}
+
+.sitting-date {
+  flex: none;
+  white-space: nowrap;
+}

@@ -5,9 +5,10 @@
 // and Groq usage stays inside the free daily limit.
 import {
   fetchAirQuality, fetchBloodDonations, fetchEarthquakes, fetchExchangeRates, fetchFloodStations, fetchFuelPrice,
-  fetchGdp, fetchInflation, fetchKlci, fetchNews, fetchStaplePrices, fetchStateGdp, fetchUnemployment, fetchWeatherWarnings, setApiBase,
+  fetchGdp, fetchInflation, fetchKlci, fetchNews, fetchParliament, fetchStaplePrices, fetchStateGdp, fetchUnemployment, fetchWeatherWarnings, setApiBase,
 } from "../src/api.js";
-import { economyFacts, hazardFacts, healthFacts, newsFacts } from "../src/lib/facts.js";
+import { economyFacts, hazardFacts, healthFacts, newsFacts, parliamentFacts } from "../src/lib/facts.js";
+import { malaysiaToday } from "../src/lib/parliament.js";
 import type { Tone } from "../src/lib/headlines.js";
 import { filterByTopic, type Topic } from "../src/lib/topics.js";
 import { dayMetrics, type DayMetrics } from "../src/lib/trends.js";
@@ -18,7 +19,7 @@ export interface AiLabel {
   topics: Topic[];
 }
 
-export type BriefPanel = "daily" | "hazards" | "economy" | "health" | "news";
+export type BriefPanel = "daily" | "hazards" | "economy" | "health" | "news" | "parliament";
 
 export interface Brief {
   labels: Record<string, AiLabel>;
@@ -45,10 +46,10 @@ export async function buildBrief(request: Request, apiKey: string | undefined): 
     return response?.ok ? response.json() : undefined;
   };
 
-  const [news, warnings, air, stations, earthquakes, blood, rates, fuel, staples, inflation, unemployment, gdp, stateGdp, klci] = await Promise.all([
+  const [news, warnings, air, stations, earthquakes, blood, rates, fuel, staples, inflation, unemployment, gdp, stateGdp, klci, parliament] = await Promise.all([
     optional(fetchNews()), optional(fetchWeatherWarnings()), optional(fetchAirQuality()), optional(fetchFloodStations()),
     optional(fetchEarthquakes()), optional(fetchBloodDonations()), optional(fetchExchangeRates()), optional(fetchFuelPrice()), optional(fetchStaplePrices()),
-    optional(fetchInflation()), optional(fetchUnemployment()), optional(fetchGdp()), optional(fetchStateGdp()), optional(fetchKlci()),
+    optional(fetchInflation()), optional(fetchUnemployment()), optional(fetchGdp()), optional(fetchStateGdp()), optional(fetchKlci()), optional(fetchParliament()),
   ]);
 
   // New headlines are labelled a few at a time. Any left when time runs out are labelled on the next run.
@@ -71,6 +72,7 @@ export async function buildBrief(request: Request, apiKey: string | undefined): 
     economy: economyFacts({ rates, fuel, staples, gdp, inflation, unemployment, stateGdp, klci }),
     health: healthFacts({ blood, news: labelled, earthquakes }),
     news: labelled && newsFacts(labelled),
+    parliament: parliamentFacts(parliament, labelled, malaysiaToday()),
   };
   facts.daily = Object.values(facts).filter(Boolean).join("\n\n");
 

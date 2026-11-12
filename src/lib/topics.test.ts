@@ -17,6 +17,11 @@ it("prefers the AI's topics once a headline has them, except for Sabah and Saraw
   expect(filterByTopic([kuching], "borneo")).toEqual([kuching]);
 });
 
+it("finds Cabinet stories by keyword even when the AI has labelled them", () => {
+  const reshuffle = { ...story("Minor Cabinet reshuffle expected after Loke's exit"), topics: ["politics" as const] };
+  expect(filterByTopic([reshuffle, story("Ringgit steady")], "cabinet")).toEqual([reshuffle]);
+});
+
 it("matches party names as whole words only", () => {
   const stories = [story("PAS names Melaka candidates"), story("Passenger numbers rise at KLIA")];
   expect(filterByTopic(stories, "politics").map((item) => item.title)).toEqual(["PAS names Melaka candidates"]);

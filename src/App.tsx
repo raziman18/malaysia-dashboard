@@ -5,6 +5,7 @@ import { GlanceStrip, glanceInputs, type GlanceFeeds } from "./components/Glance
 import { HazardPanel } from "./components/HazardPanel";
 import { HealthSafetyPanel } from "./components/HealthSafetyPanel";
 import { NewsPanel } from "./components/NewsPanel";
+import { ParliamentPanel } from "./components/ParliamentPanel";
 import { TrendsPanel } from "./components/TrendsPanel";
 import { AiSummary } from "./components/ui";
 import { urgentItems } from "./lib/glance";
@@ -69,6 +70,7 @@ export function App() {
         <EconomyPanel rates={rates} klci={klci} summary={summaries.economy} />
         <HealthSafetyPanel earthquakes={earthquakes} news={news} summary={summaries.health} />
         <NewsPanel news={news} summary={summaries.news} />
+        <ParliamentPanel news={news} summary={summaries.parliament} />
         <TrendsPanel />
       </div>
     </main>
