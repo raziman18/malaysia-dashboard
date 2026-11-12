@@ -59,7 +59,7 @@ On the 89 hand-labelled headlines, the AI labelled 83% and 88% of tones correctl
 
 ## Parliament
 
-parlimen.gov.my has no API and does not answer cloud servers (Vercel and GitHub Actions both time out), so the Parliament data is a file in the repo, `public/parliament.json`. Refresh it from a computer in Malaysia with `npm run parliament`, then commit and push. The sitting calendar is set once per meeting, so the file mainly goes stale on new bills, and the panel shows the date it was refreshed. The link to today's order paper is built from the date, so it always points at the current one.
+parlimen.gov.my has no API and does not answer cloud servers (Vercel and GitHub Actions both time out), so the Parliament data is a file in the repo, `public/parliament.json`. Refresh it from a computer in Malaysia with `npm run parliament`, then commit and push. `scripts/refresh-parliament.sh` does all three and pushes only when something changed. A Raspberry Pi runs it from cron twice a day. The sitting calendar is set once per meeting, so the file mainly goes stale on new bills, and the panel shows the date it was refreshed. The link to today's order paper is built from the date, so it always points at the current one.
 
 The site does not send its intermediate TLS certificate, so `scripts/parliament.ts` supplies Sectigo's public intermediate and still verifies the connection fully. If the site changes its page layout, the parsers in `src/lib/parliament.ts` need updating (their tests use trimmed copies of the real pages). The Cabinet does not publish meeting dates or decisions as data, so the panel shows Cabinet news instead.
 
