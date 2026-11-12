@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { fetchAirQuality, fetchBrief, fetchEarthquakes, fetchExchangeRates, fetchFloodStations, fetchKlci, fetchNewsReport, fetchWeatherWarnings } from "./api";
+import { CategoryNav } from "./components/CategoryNav";
 import { EconomyPanel } from "./components/EconomyPanel";
 import { GlanceStrip, glanceInputs, type GlanceFeeds } from "./components/GlanceStrip";
 import { HazardPanel } from "./components/HazardPanel";
@@ -9,6 +10,7 @@ import { ParliamentPanel } from "./components/ParliamentPanel";
 import { SourcesPanel } from "./components/SourcesPanel";
 import { TrendsPanel } from "./components/TrendsPanel";
 import { AiSummary } from "./components/ui";
+import { categoryFromHash } from "./lib/categories";
 import { urgentItems } from "./lib/glance";
 import { needsAttention } from "./lib/health";
 import { filterByTopic } from "./lib/topics";
@@ -45,10 +47,21 @@ export function App() {
   };
   const alerts = useAlerts(urgentItems(glanceInputs(glanceFeeds)));
   const [now, setNow] = useState(new Date());
+  const [category, setCategory] = useState(() => categoryFromHash(location.hash));
+  const shows = (id: string) => category === "all" || category === id;
 
   useEffect(() => {
     const timer = setInterval(() => setNow(new Date()), 30_000);
     return () => clearInterval(timer);
+  }, []);
+
+  useEffect(() => {
+    const onHashChange = () => {
+      setCategory(categoryFromHash(location.hash));
+      scrollTo({ top: 0 });
+    };
+    addEventListener("hashchange", onHashChange);
+    return () => removeEventListener("hashchange", onHashChange);
   }, []);
 
   return (
@@ -77,16 +90,25 @@ export function App() {
           )}
         </div>
       </header>
-      <AiSummary title="Today's brief" summary={summaries.daily} />
-      <GlanceStrip {...glanceFeeds} />
-      <div className="grid">
-        <HazardPanel warnings={warnings} air={air} stations={floodStations} floodNews={floodNews} summary={summaries.hazards} />
-        <EconomyPanel rates={rates} klci={klci} summary={summaries.economy} />
-        <HealthSafetyPanel earthquakes={earthquakes} news={news} summary={summaries.health} />
-        <NewsPanel news={news} summary={summaries.news} />
-        <ParliamentPanel news={news} summary={summaries.parliament} />
-        <TrendsPanel />
-        <SourcesPanel sources={sources} />
+      <div className="layout">
+        <CategoryNav selected={category} />
+        <div>
+          {category === "all" && (
+            <>
+              <AiSummary title="Today's brief" summary={summaries.daily} />
+              <GlanceStrip {...glanceFeeds} />
+            </>
+          )}
+          <div className={category === "all" ? "grid" : "grid single"}>
+            {shows("hazards") && <HazardPanel warnings={warnings} air={air} stations={floodStations} floodNews={floodNews} summary={summaries.hazards} />}
+            {shows("economy") && <EconomyPanel rates={rates} klci={klci} summary={summaries.economy} />}
+            {shows("health") && <HealthSafetyPanel earthquakes={earthquakes} news={news} summary={summaries.health} />}
+            {shows("news") && <NewsPanel news={news} summary={summaries.news} />}
+            {shows("parliament") && <ParliamentPanel news={news} summary={summaries.parliament} />}
+            {shows("trends") && <TrendsPanel />}
+            {shows("sources") && <SourcesPanel sources={sources} />}
+          </div>
+        </div>
       </div>
     </main>
   );

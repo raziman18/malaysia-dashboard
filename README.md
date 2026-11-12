@@ -63,6 +63,10 @@ parlimen.gov.my has no API and does not answer cloud servers (Vercel and GitHub 
 
 The site does not send its intermediate TLS certificate, so `scripts/parliament.ts` supplies Sectigo's public intermediate and still verifies the connection fully. If the site changes its page layout, the parsers in `src/lib/parliament.ts` need updating (their tests use trimmed copies of the real pages). The Cabinet does not publish meeting dates or decisions as data, so the panel shows Cabinet news instead.
 
+## Categories
+
+The sidebar (a row of buttons on phones) shows one panel at a time. The choice is kept in the address, such as `/#economy`, so a filtered view can be bookmarked or shared. "All" shows every panel with the daily brief and the most urgent items.
+
 ## Source health
 
 The Source health panel lists every source as working, stale (it loads, but its newest data is older than expected), or failing, with the reason. It runs in the visitor's browser (`useSourceHealth`), so it needs no other channel. When any source needs attention, a line under the title links to the panel. News outlets are checked one by one, so one failing outlet is visible even though the others still fill the news panel. The JPS river feed is left out because it stopped in 2024.
