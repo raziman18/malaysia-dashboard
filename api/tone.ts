@@ -19,7 +19,7 @@ export async function labelTone(requestUrl: string, apiKey: string | undefined):
   if (!apiKey) return json({ error: "GROQ_API_KEY is not set" }, 503);
   if (!title || title.length > 300) return json({ error: "Expected a headline of 1 to 300 characters" }, 400);
 
-  const { reply, status = 502, error = "Groq returned an unexpected reply" } = await askGroq(apiKey, instructions, title, schema, 400);
+  const { reply, status = 502, error = "Groq returned an unexpected reply" } = await askGroq(apiKey, "openai/gpt-oss-20b", instructions, title, schema, 400);
   if (reply && tones.includes(reply.tone as string)) return json({ tone: reply.tone }, 200, keepForMonth);
   return json({ error }, status);
 }

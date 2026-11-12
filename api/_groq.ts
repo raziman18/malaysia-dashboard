@@ -2,15 +2,14 @@
 // Vercel does not turn files whose names start with _ into functions. Import it as "./_groq.js", because
 // Vercel runs these files as ES modules, which need the extension.
 
-const model = "openai/gpt-oss-20b";
-
 export const json = (body: unknown, status: number, cacheControl = "no-store") =>
   new Response(JSON.stringify(body), { status, headers: { "Content-Type": "application/json", "Cache-Control": cacheControl } });
 
 // Answers that never change for the same input, kept by the browser for a day and by Vercel's CDN for 30 days.
 export const keepForMonth = "public, max-age=86400, s-maxage=2592000, immutable";
 
-export async function askGroq(apiKey: string, system: string, user: string, schema: object, maxTokens: number) {
+// Groq sets rate limits per model, so routes on different models do not slow each other down.
+export async function askGroq(apiKey: string, model: string, system: string, user: string, schema: object, maxTokens: number) {
   const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
     method: "POST",
     headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },

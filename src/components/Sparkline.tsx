@@ -1,5 +1,6 @@
 import { useState } from "react";
-import type { Point } from "../lib/economy";
+import { percentChange, type Point } from "../lib/economy";
+import { signedPercent } from "../lib/format";
 
 const width = 320;
 const height = 64;
@@ -18,13 +19,16 @@ export function Sparkline({ title, points, format }: { title: string; points: Po
   const path = points.map((point, index) => `${index ? "L" : "M"}${x(index)},${y(point.value)}`).join("");
   const activeIndex = hovered ?? points.length - 1;
   const active = points[activeIndex];
+  const previous = points[activeIndex - 1];
 
   return (
     <figure className="sparkline">
       <figcaption>
         <span>{title}</span>
         <span>
-          <strong>{format(active.value)}</strong> <span className="muted">{active.date}</span>
+          <strong>{format(active.value)}</strong>{" "}
+          {previous && <span>{signedPercent(percentChange(active.value, previous.value))} on previous day</span>}{" "}
+          <span className="muted">{active.date}</span>
         </span>
       </figcaption>
       <svg
