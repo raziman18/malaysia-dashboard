@@ -7,7 +7,8 @@ const height = 64;
 const inset = 6;
 
 // A single-series trend line. Hovering moves the readout to the nearest day.
-export function Sparkline({ title, points, format }: { title: string; points: Point[]; format: (value: number) => string }) {
+// Pass showChange={false} for counts, where a percentage change from the day before means little.
+export function Sparkline({ title, points, format, showChange = true }: { title: string; points: Point[]; format: (value: number) => string; showChange?: boolean }) {
   const [hovered, setHovered] = useState<number>();
   if (points.length < 2) return null;
 
@@ -19,7 +20,7 @@ export function Sparkline({ title, points, format }: { title: string; points: Po
   const path = points.map((point, index) => `${index ? "L" : "M"}${x(index)},${y(point.value)}`).join("");
   const activeIndex = hovered ?? points.length - 1;
   const active = points[activeIndex];
-  const previous = points[activeIndex - 1];
+  const previous = showChange ? points[activeIndex - 1] : undefined;
 
   return (
     <figure className="sparkline">

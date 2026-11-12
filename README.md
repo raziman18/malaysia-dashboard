@@ -21,6 +21,10 @@ npm test
 
 The map colours each state by its worst current issue (`stateIssues` in `src/lib/states.ts`): weather warnings that name the state (sea warnings count lower), air that is unhealthy for sensitive groups or worse in its capital, rivers above normal when the JPS feed is fresh, and flood news that names the state. The boundaries come from DOSM's open data (DOSM Open Data Licence) and are turned into SVG paths by `scripts/build-state-shapes.mjs`.
 
+## Trends
+
+`scripts/snapshot.mjs` saves the day's figures from `/api/brief` (negative headline share, weather warnings, flood stories, worst air quality, KLCI close and the US dollar rate) into `public/history.json`. The `Daily snapshot` GitHub Action runs it at 9 pm Malaysia time and commits the file, so the trends panel needs no database. The `Refresh AI brief` Action requests the brief every 30 minutes so it is always ready.
+
 ## Install and alerts
 
 The dashboard can be installed as an app from the browser menu ("Add to home screen" or "Install app"). "Turn on alerts" sends a notification for each new urgent item, using the same rules as the top four boxes (`urgentItems` in `src/lib/glance.ts`): very unhealthy air, rivers at warning or danger level, a strong nearby earthquake, or a KLCI move of 2% or more. Alerts arrive only while the dashboard is open, including in a background tab, because the site has no server that stores subscriptions. On iPhone, notifications work only after adding the dashboard to the home screen.

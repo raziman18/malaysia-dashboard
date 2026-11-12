@@ -2,6 +2,7 @@ import { joinGdpSeries, stateGdpShares, yearOnYearChange, type Point } from "./l
 import { parseRss, type Headline } from "./lib/headlines.js";
 import type { Brief } from "../api/brief.js";
 import type { StaplePrice } from "../api/prices.js";
+import type { DayMetrics } from "./lib/trends.js";
 import { activeWarnings, type Earthquake, type FloodStation, type WeatherWarning } from "./lib/warnings.js";
 
 // Empty in the browser. The server sets its own address, because Node cannot fetch relative URLs.
@@ -106,6 +107,8 @@ export async function fetchAirQuality() {
 export const fetchBrief = () => getJson<Brief>("/api/brief");
 
 export const fetchStaplePrices = () => getJson<StaplePrice[]>("/api/prices");
+
+export const fetchHistory = () => getJson<DayMetrics[]>("/history.json");
 
 // Most of these outlets publish a photo with each story, which Google News does not. The last three are in Malay.
 const newsFeeds = [

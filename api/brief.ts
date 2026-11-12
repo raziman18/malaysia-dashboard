@@ -10,6 +10,7 @@ import {
 import { economyFacts, hazardFacts, healthFacts, newsFacts } from "../src/lib/facts.js";
 import type { Tone } from "../src/lib/headlines.js";
 import { filterByTopic, type Topic } from "../src/lib/topics.js";
+import { dayMetrics, type DayMetrics } from "../src/lib/trends.js";
 import { internalKey, json } from "./_groq.js";
 
 export interface AiLabel {
@@ -22,6 +23,8 @@ export type BriefPanel = "daily" | "hazards" | "economy" | "health" | "news";
 export interface Brief {
   labels: Record<string, AiLabel>;
   summaries: Partial<Record<BriefPanel, string>>;
+  // Today's figures for the trends panel.
+  metrics: Omit<DayMetrics, "date">;
   generated: string;
 }
 
@@ -83,7 +86,8 @@ export async function buildBrief(request: Request, apiKey: string | undefined): 
 
   // An unfinished brief is kept only briefly, so the missing parts are filled in soon.
   const complete = Object.keys(labels).length === new Set(news?.map((headline) => headline.title)).size && Object.values(summaries).every(Boolean);
-  const brief: Brief = { labels, summaries, generated: new Date().toISOString() };
+  const metrics = dayMetrics({ news: labelled, warnings, air, klci, rates });
+  const brief: Brief = { labels, summaries, metrics, generated: new Date().toISOString() };
   return json(brief, 200, `public, s-maxage=${complete ? 1800 : 120}, stale-while-revalidate=86400`);
 }
 
