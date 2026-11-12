@@ -3,6 +3,8 @@ import { useEffect, useState } from "react";
 export interface FetchState<T> {
   data?: T;
   error?: string;
+  // When the data last loaded successfully.
+  checkedAt?: Date;
 }
 
 const tenMinutes = 10 * 60_000;
@@ -17,7 +19,7 @@ export function useFetch<T>(load: (() => Promise<T>) | null, refreshMs = tenMinu
     setState({});
     const run = () =>
       load().then(
-        (data) => active && setState({ data }),
+        (data) => active && setState({ data, checkedAt: new Date() }),
         (error: Error) => active && setState((previous) => ({ ...previous, error: error.message })),
       );
     run();

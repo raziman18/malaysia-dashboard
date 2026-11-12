@@ -11,7 +11,7 @@ export function HealthSafetyPanel({ earthquakes, news, summary }: { earthquakes:
   const blood = useFetch(fetchBloodDonations);
 
   return (
-    <Panel title="Public health and safety" sources="National Blood Centre and MET Malaysia via data.gov.my, Free Malaysia Today, Malay Mail, New Straits Times">
+    <Panel title="Public health and safety" sources="National Blood Centre and MET Malaysia via data.gov.my, Free Malaysia Today, Malay Mail, New Straits Times" feeds={[blood, news, earthquakes]}>
       <AiSummary summary={summary} />
       <Async state={blood}>{(points) => <Sparkline title="Blood donations per day, last 30 days" points={points} format={(value) => value.toLocaleString("en-MY")} />}</Async>
       <h3>Health news</h3>

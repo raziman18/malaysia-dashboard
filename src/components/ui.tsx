@@ -4,12 +4,18 @@ import { timeLabel } from "../lib/format";
 import type { Status } from "../lib/status";
 import type { FetchState } from "../useFetch";
 
-export function Panel({ title, sources, children }: { title: string; sources: string; children: ReactNode }) {
+// Shows when the panel's oldest feed last loaded, and says when a feed failed to refresh.
+export function Panel({ title, sources, feeds, children }: { title: string; sources: string; feeds: FetchState<unknown>[]; children: ReactNode }) {
+  const oldest = Math.min(...feeds.map((feed) => feed.checkedAt?.getTime() ?? 0));
   return (
     <section className="panel">
       <h2>{title}</h2>
       {children}
-      <p className="source">Sources: {sources}</p>
+      <p className="source">
+        Sources: {sources}
+        {oldest > 0 && <> Checked at {timeLabel(new Date(oldest))}.</>}
+        {feeds.some((feed) => feed.error) && <> Some feeds did not respond on the last try.</>}
+      </p>
     </section>
   );
 }

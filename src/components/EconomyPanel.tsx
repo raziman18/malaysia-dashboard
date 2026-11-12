@@ -16,7 +16,7 @@ export function EconomyPanel({ rates, klci, summary }: { rates: FetchState<Rates
   const stateGdp = useFetch(fetchStateGdp);
 
   return (
-    <Panel title="Economy" sources="Bank Negara Malaysia, data.gov.my (DOSM, Ministry of Finance; real GDP at constant 2015 prices), Yahoo Finance (unofficial)">
+    <Panel title="Economy" sources="Bank Negara Malaysia, data.gov.my (DOSM, Ministry of Finance; real GDP at constant 2015 prices), Yahoo Finance (unofficial)" feeds={[rates, klci, fuel, inflation, unemployment, gdp, stateGdp]}>
       <AiSummary summary={summary} />
       <div className="tiles">
         <Async state={rates}>

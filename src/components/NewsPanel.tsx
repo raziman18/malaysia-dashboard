@@ -15,7 +15,7 @@ export function NewsPanel({ news, summary }: { news: FetchState<Headline[]>; sum
   const [tab, setTab] = useState(tabs[0]);
 
   return (
-    <Panel title="News and sentiment" sources="Free Malaysia Today, Malay Mail, New Straits Times (last 24 hours). Tone labels come from an AI model on Groq; a ? marks a keyword guess.">
+    <Panel title="News and sentiment" sources="Free Malaysia Today, Malay Mail, New Straits Times (last 24 hours). Tone labels come from an AI model on Groq; a ? marks a keyword guess." feeds={[news]}>
       <AiSummary summary={summary} />
       <div className="tabs" role="tablist">
         {tabs.map((item) => (
