@@ -1,7 +1,7 @@
 // Vercel function that labels one headline's tone with a model hosted on Groq. Each headline has its own URL,
 // /api/tone?title=..., and Vercel's CDN keeps the answer for 30 days, so a headline is labelled once however
 // many people open the dashboard. That keeps usage inside Groq's free daily token limit.
-import { askGroq, json, keepForMonth } from "./_groq";
+import { askGroq, json, keepForMonth } from "./_groq.js";
 
 const tones = ["positive", "neutral", "negative"];
 

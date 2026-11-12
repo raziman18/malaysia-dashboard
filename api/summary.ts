@@ -1,7 +1,7 @@
 // Vercel function that writes a short AI summary of one dashboard panel with a model hosted on Groq.
 // The browser sends the panel's facts as plain text in /api/summary?facts=..., so the same facts share one
 // URL and Vercel's CDN answers repeats without calling Groq again.
-import { askGroq, json, keepForMonth } from "./_groq";
+import { askGroq, json, keepForMonth } from "./_groq.js";
 
 const instructions = `You brief Malaysia's Prime Minister on one panel of a daily situation dashboard.
 Use only the facts given. Do not add numbers, causes, or events that are not in the facts.

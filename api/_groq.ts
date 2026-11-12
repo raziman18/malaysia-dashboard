@@ -1,5 +1,6 @@
 // Shared call to a model hosted on Groq that must answer with JSON matching a schema.
-// Vercel does not turn files whose names start with _ into functions.
+// Vercel does not turn files whose names start with _ into functions. Import it as "./_groq.js", because
+// Vercel runs these files as ES modules, which need the extension.
 
 const model = "openai/gpt-oss-20b";
 
