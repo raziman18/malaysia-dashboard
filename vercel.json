@@ -28,10 +28,6 @@
       "destination": "https://www.malaymail.com/:path*"
     },
     {
-      "source": "/api/nst/:path*",
-      "destination": "https://www.nst.com.my/:path*"
-    },
-    {
       "source": "/api/awani/:path*",
       "destination": "https://www.astroawani.com/:path*"
     },

@@ -15,7 +15,7 @@ npm test
 | Disasters and weather | A state map of current issues, active weather warnings, live rain radar, flood news, air quality in 16 state capitals | MET Malaysia and JPS (data.gov.my), MET radar, Open-Meteo, news outlets |
 | Economy | Exchange rates, fuel prices and their weekly change, staple food prices, GDP, inflation, unemployment, FBM KLCI | Bank Negara Malaysia, data.gov.my, PriceCatcher (`api/prices.ts`), Yahoo Finance |
 | Public health and safety | Daily blood donations, health and incident news, regional earthquakes | data.gov.my, news outlets |
-| News and sentiment | Stories with photos by topic, with a headline tone score | Free Malaysia Today, Malay Mail, New Straits Times, Astro Awani, Utusan Malaysia, Sinar Harian |
+| News and sentiment | Stories with photos by topic, with a headline tone score | Free Malaysia Today, Malay Mail, Astro Awani, Utusan Malaysia, Sinar Harian |
 | Parliament and Cabinet | Whether the Dewan Rakyat sits today, upcoming sittings, the latest order paper, recent bills, and Cabinet news | parlimen.gov.my (`public/parliament.json`), news outlets |
 
 ## State map

@@ -119,13 +119,12 @@ const newsFeeds = [
   ["Free Malaysia Today", "/api/fmt/category/business/feed"],
   ["Malay Mail", "/api/malaymail/feed/rss/malaysia"],
   ["Malay Mail", "/api/malaymail/feed/rss/money"],
-  ["New Straits Times", "/api/nst/feed"],
   ["Astro Awani", "/api/awani/rss/national/public"],
   ["Utusan Malaysia", "/api/utusan-nasional"],
   ["Sinar Harian", "/api/sinar/rssFeed/211"],
 ];
 
-export const newsOutlets = "Free Malaysia Today, Malay Mail, New Straits Times, Astro Awani, Utusan Malaysia, Sinar Harian";
+export const newsOutlets = "Free Malaysia Today, Malay Mail, Astro Awani, Utusan Malaysia, Sinar Harian";
 
 export interface OutletResult {
   name: string;
