@@ -1,0 +1,12 @@
+# Requests the AI brief every 30 minutes, so Vercel's CDN always holds a fresh copy and visitors never wait for it.
+name: Refresh AI brief
+on:
+  schedule:
+    - cron: "*/30 * * * *"
+  workflow_dispatch:
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - run: curl --fail --silent --show-error --max-time 90 --output /dev/null https://malaysia-dashboard.vercel.app/api/brief

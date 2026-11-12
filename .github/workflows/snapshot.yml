@@ -1,0 +1,23 @@
+# Saves the day's figures into public/history.json for the trends panel, at 9 pm Malaysia time.
+name: Daily snapshot
+on:
+  schedule:
+    - cron: "0 13 * * *"
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  snapshot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: node scripts/snapshot.mjs
+      - run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add public/history.json
+          git diff --cached --quiet || (git commit -m "Save daily snapshot" && git push)
