@@ -4,6 +4,7 @@ import react from "@vitejs/plugin-react";
 import { dataGovUrl } from "./api/gov";
 import { buildBrief } from "./api/brief";
 import { labelHeadline } from "./api/label";
+import { GET as staplePrices } from "./api/prices";
 import { summarise } from "./api/summary";
 
 // The public APIs block browser requests from other origins (CORS), so the dev server forwards them.
@@ -40,7 +41,8 @@ function dataGovMy(token?: string): Plugin {
         const url = dataGovUrl(path, query);
         let pending = cache.get(url);
         if (!pending || (await pending).expires < Date.now()) {
-          pending = load(url);
+          // A network failure becomes a 502 reply instead of crashing the dev server.
+          pending = load(url).catch((error: Error) => ({ status: 502, body: JSON.stringify({ error: error.message }), expires: 0 }));
           cache.set(url, pending);
         }
         const reply = await pending;
@@ -53,16 +55,18 @@ function dataGovMy(token?: string): Plugin {
   };
 }
 
-// Serves the same /api/brief, /api/label and /api/summary functions that Vercel runs.
+// Serves the same /api/brief, /api/label, /api/summary and /api/prices functions that Vercel runs.
 function aiRoutes(apiKey?: string): Plugin {
-  const routes = { "/api/brief": buildBrief, "/api/label": labelHeadline, "/api/summary": summarise };
+  const routes = { "/api/brief": buildBrief, "/api/label": labelHeadline, "/api/summary": summarise, "/api/prices": staplePrices };
   return {
     name: "ai-routes",
     configureServer(server) {
       for (const [path, handle] of Object.entries(routes)) {
         server.middlewares.use(path, async (request, response) => {
           const headers = new Headers(Object.entries(request.headers).map(([key, value]): [string, string] => [key, String(value)]));
-          const reply = await handle(new Request(`http://${request.headers.host}${request.originalUrl}`, { headers }), apiKey);
+          const reply = await handle(new Request(`http://${request.headers.host}${request.originalUrl}`, { headers }), apiKey).catch(
+            (error: Error) => new Response(JSON.stringify({ error: error.message }), { status: 502 }),
+          );
           response.statusCode = reply.status;
           reply.headers.forEach((value, key) => response.setHeader(key, value));
           response.end(await reply.text());

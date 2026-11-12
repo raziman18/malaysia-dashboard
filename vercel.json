@@ -2,6 +2,9 @@
   "functions": {
     "api/brief.ts": {
       "maxDuration": 60
+    },
+    "api/prices.ts": {
+      "maxDuration": 60
     }
   },
   "rewrites": [

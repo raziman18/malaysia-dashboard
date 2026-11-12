@@ -1,6 +1,7 @@
 import { joinGdpSeries, stateGdpShares, yearOnYearChange, type Point } from "./lib/economy.js";
 import { parseRss, type Headline } from "./lib/headlines.js";
 import type { Brief } from "../api/brief.js";
+import type { StaplePrice } from "../api/prices.js";
 import { activeWarnings, type Earthquake, type FloodStation, type WeatherWarning } from "./lib/warnings.js";
 
 // Empty in the browser. The server sets its own address, because Node cannot fetch relative URLs.
@@ -19,8 +20,7 @@ const getJson = async <T>(url: string, init?: RequestInit): Promise<T> => (await
 
 const catalogue = <T>(query: string) => getJson<T[]>(`/api/gov/data-catalogue?${query}`);
 
-export interface FuelPrice {
-  date: string;
+interface FuelLevels {
   ron95: number;
   ron95_budi95: number;
   ron97: number;
@@ -28,7 +28,17 @@ export interface FuelPrice {
   diesel_eastmsia: number;
 }
 
-export const fetchFuelPrice = async () => (await catalogue<FuelPrice>("id=fuelprice&filter=level@series_type&sort=-date&limit=1"))[0];
+export interface FuelPrice extends FuelLevels {
+  date: string;
+  weeklyChange?: FuelLevels;
+}
+
+// The latest week has two rows: price levels and the change from the week before.
+export async function fetchFuelPrice(): Promise<FuelPrice> {
+  const rows = await catalogue<FuelLevels & { date: string; series_type: string }>("id=fuelprice&sort=-date&limit=2");
+  const level = rows.find((row) => row.series_type === "level")!;
+  return { ...level, weeklyChange: rows.find((row) => row.series_type === "change_weekly" && row.date === level.date) };
+}
 
 export async function fetchInflation() {
   const rows = await catalogue<{ date: string; index: number }>("id=cpi_headline&filter=overall@division&sort=-date&limit=13");
@@ -92,6 +102,8 @@ export async function fetchAirQuality() {
 }
 
 export const fetchBrief = () => getJson<Brief>("/api/brief");
+
+export const fetchStaplePrices = () => getJson<StaplePrice[]>("/api/prices");
 
 // Most of these outlets publish a photo with each story, which Google News does not. The last three are in Malay.
 const newsFeeds = [

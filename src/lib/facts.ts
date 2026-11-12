@@ -1,6 +1,7 @@
+import type { StaplePrice } from "../../api/prices.js";
 import type { FuelPrice } from "../api.js";
 import { percentChange, type GdpQuarter, type Point, type StateGdp } from "./economy.js";
-import { dayLabel, monthLabel, quarterLabel, ringgit, ringgitBillions, signedPercent, timeLabel } from "./format.js";
+import { dayLabel, monthLabel, priceChangeLabel, quarterLabel, ringgit, ringgitBillions, ringgitChange, signedPercent, timeLabel } from "./format.js";
 import type { Headline } from "./headlines.js";
 import { airQualityBand } from "./status.js";
 import { filterByTopic } from "./topics.js";
@@ -15,6 +16,7 @@ const headlineLines = (heading: string, headlines: Headline[], limit = 5) =>
 export interface EconomyData {
   rates?: { code: string; ringgit: number }[];
   fuel?: FuelPrice;
+  staples?: StaplePrice[];
   gdp?: GdpQuarter[];
   inflation?: { date: string; yearOnYear?: number };
   unemployment?: { date: string; u_rate: number };
@@ -22,11 +24,16 @@ export interface EconomyData {
   klci?: Point[];
 }
 
-export function economyFacts({ rates, fuel, gdp, inflation, unemployment, stateGdp, klci }: EconomyData): string {
+export function economyFacts({ rates, fuel, staples, gdp, inflation, unemployment, stateGdp, klci }: EconomyData): string {
   const lines = ["Panel: Economy"];
   if (rates) lines.push(`Ringgit per foreign unit, BNM middle rate: ${rates.map((rate) => `${rate.code} ${ringgit(rate.ringgit, 4)}`).join(", ")}`);
   if (fuel) {
     lines.push(`Fuel prices, week of ${dayLabel(fuel.date)}: RON95 (BUDI95) ${ringgit(fuel.ron95_budi95)}, unsubsidised RON95 ${ringgit(fuel.ron95)}, diesel Peninsular ${ringgit(fuel.diesel)}, East Malaysia ${ringgit(fuel.diesel_eastmsia)}`);
+    const change = fuel.weeklyChange;
+    if (change) lines.push(`Fuel price change from last week: RON95 (BUDI95) ${ringgitChange(change.ron95_budi95)}, unsubsidised RON95 ${ringgitChange(change.ron95)}, diesel Peninsular ${ringgitChange(change.diesel)}, East Malaysia ${ringgitChange(change.diesel_eastmsia)}`);
+  }
+  if (staples?.length) {
+    lines.push("Staple food prices, median across shops (PriceCatcher):", ...staples.map((item) => `- ${item.name}: ${ringgit(item.price)} on ${dayLabel(item.date)} ${priceChangeLabel(item)}`.trim()));
   }
   if (gdp && gdp.length >= 2) {
     const [previous, latest] = gdp.slice(-2);

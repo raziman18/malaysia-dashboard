@@ -5,7 +5,7 @@
 // and Groq usage stays inside the free daily limit.
 import {
   fetchAirQuality, fetchBloodDonations, fetchEarthquakes, fetchExchangeRates, fetchFloodStations, fetchFuelPrice,
-  fetchGdp, fetchInflation, fetchKlci, fetchNews, fetchStateGdp, fetchUnemployment, fetchWeatherWarnings, setApiBase,
+  fetchGdp, fetchInflation, fetchKlci, fetchNews, fetchStaplePrices, fetchStateGdp, fetchUnemployment, fetchWeatherWarnings, setApiBase,
 } from "../src/api.js";
 import { economyFacts, hazardFacts, healthFacts, newsFacts } from "../src/lib/facts.js";
 import type { Tone } from "../src/lib/headlines.js";
@@ -42,9 +42,9 @@ export async function buildBrief(request: Request, apiKey: string | undefined): 
     return response?.ok ? response.json() : undefined;
   };
 
-  const [news, warnings, air, stations, earthquakes, blood, rates, fuel, inflation, unemployment, gdp, stateGdp, klci] = await Promise.all([
+  const [news, warnings, air, stations, earthquakes, blood, rates, fuel, staples, inflation, unemployment, gdp, stateGdp, klci] = await Promise.all([
     optional(fetchNews()), optional(fetchWeatherWarnings()), optional(fetchAirQuality()), optional(fetchFloodStations()),
-    optional(fetchEarthquakes()), optional(fetchBloodDonations()), optional(fetchExchangeRates()), optional(fetchFuelPrice()),
+    optional(fetchEarthquakes()), optional(fetchBloodDonations()), optional(fetchExchangeRates()), optional(fetchFuelPrice()), optional(fetchStaplePrices()),
     optional(fetchInflation()), optional(fetchUnemployment()), optional(fetchGdp()), optional(fetchStateGdp()), optional(fetchKlci()),
   ]);
 
@@ -65,7 +65,7 @@ export async function buildBrief(request: Request, apiKey: string | undefined): 
 
   const facts: Partial<Record<BriefPanel, string>> = {
     hazards: hazardFacts({ warnings, air, stations, floodNews: labelled && filterByTopic(labelled, "flood") }),
-    economy: economyFacts({ rates, fuel, gdp, inflation, unemployment, stateGdp, klci }),
+    economy: economyFacts({ rates, fuel, staples, gdp, inflation, unemployment, stateGdp, klci }),
     health: healthFacts({ blood, news: labelled, earthquakes }),
     news: labelled && newsFacts(labelled),
   };

@@ -489,3 +489,15 @@ figure {
   background: var(--surface);
 }
 
+
+.price {
+  display: grid;
+  justify-items: end;
+  flex: none;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.price .muted {
+  font-size: 0.8rem;
+}

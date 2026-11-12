@@ -1,6 +1,6 @@
-import { fetchFuelPrice, fetchGdp, fetchInflation, fetchStateGdp, fetchUnemployment, type fetchExchangeRates } from "../api";
+import { fetchFuelPrice, fetchGdp, fetchInflation, fetchStaplePrices, fetchStateGdp, fetchUnemployment, type fetchExchangeRates } from "../api";
 import type { Point } from "../lib/economy";
-import { dayLabel, monthLabel, quarterLabel, ringgit, ringgitBillions, signedPercent } from "../lib/format";
+import { dayLabel, monthLabel, priceChangeLabel, quarterLabel, ringgit, ringgitBillions, ringgitChange, signedPercent } from "../lib/format";
 import { useFetch, type FetchState } from "../useFetch";
 import { BarChart } from "./BarChart";
 import { Sparkline } from "./Sparkline";
@@ -8,15 +8,20 @@ import { AiSummary, Async, Panel, StatTile } from "./ui";
 
 type Rates = Awaited<ReturnType<typeof fetchExchangeRates>>;
 
+// The change applies to the price before it, for example "RM 4.87 (-RM 0.25 this week)".
+// For example "-RM 0.25 this week, ", or nothing when the change is not published.
+const weekly = (change?: number) => (change === undefined ? "" : `${ringgitChange(change)} this week, `);
+
 export function EconomyPanel({ rates, klci, summary }: { rates: FetchState<Rates>; klci: FetchState<Point[]>; summary?: string }) {
   const fuel = useFetch(fetchFuelPrice);
   const inflation = useFetch(fetchInflation);
   const unemployment = useFetch(fetchUnemployment);
   const gdp = useFetch(fetchGdp);
   const stateGdp = useFetch(fetchStateGdp);
+  const staples = useFetch(fetchStaplePrices);
 
   return (
-    <Panel title="Economy" sources="Bank Negara Malaysia, data.gov.my (DOSM, Ministry of Finance; real GDP at constant 2015 prices), Yahoo Finance (unofficial)" feeds={[rates, klci, fuel, inflation, unemployment, gdp, stateGdp]}>
+    <Panel title="Economy" sources="Bank Negara Malaysia, data.gov.my (DOSM, Ministry of Finance, KPDN PriceCatcher; real GDP at constant 2015 prices), Yahoo Finance (unofficial)" feeds={[rates, klci, fuel, staples, inflation, unemployment, gdp, stateGdp]}>
       <AiSummary summary={summary} />
       <div className="tiles">
         <Async state={rates}>
@@ -27,8 +32,12 @@ export function EconomyPanel({ rates, klci, summary }: { rates: FetchState<Rates
         <Async state={fuel}>
           {(price) => (
             <>
-              <StatTile label="RON95 (BUDI95)" value={ringgit(price.ron95_budi95)} detail={`Unsubsidised ${ringgit(price.ron95)}, week of ${dayLabel(price.date)}`} />
-              <StatTile label="Diesel, Peninsular" value={ringgit(price.diesel)} detail={`East Malaysia ${ringgit(price.diesel_eastmsia)}`} />
+              <StatTile
+                label="RON95 (BUDI95)"
+                value={ringgit(price.ron95_budi95)}
+                detail={`Unsubsidised ${ringgit(price.ron95)}, ${weekly(price.weeklyChange?.ron95)}prices from ${dayLabel(price.date)}`}
+              />
+              <StatTile label="Diesel, Peninsular" value={ringgit(price.diesel)} detail={`${weekly(price.weeklyChange?.diesel)}East Malaysia ${ringgit(price.diesel_eastmsia)}`} />
             </>
           )}
         </Async>
@@ -45,6 +54,24 @@ export function EconomyPanel({ rates, klci, summary }: { rates: FetchState<Rates
           {(labour) => <StatTile label="Unemployment rate" value={`${labour.u_rate}%`} detail={monthLabel(labour.date)} />}
         </Async>
       </div>
+      <h3>Staple food prices</h3>
+      <Async state={staples}>
+        {(items) => (
+          <>
+            <p className="muted">Median price across shops on the latest survey day.</p>
+            <ul className="rows">
+              {items.map((item) => (
+                <li key={item.name}>
+                  <span>{item.name}</span>
+                  <span className="price">
+                    <strong>{ringgit(item.price)}</strong> <span className="muted">{priceChangeLabel(item) || dayLabel(item.date)}</span>
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </>
+        )}
+      </Async>
       <Async state={gdp}>
         {(quarters) => (
           <BarChart
