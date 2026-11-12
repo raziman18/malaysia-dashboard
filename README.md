@@ -16,7 +16,7 @@ npm test
 | Economy | Exchange rates, fuel prices and their weekly change, staple food prices, GDP, inflation, unemployment, FBM KLCI | Bank Negara Malaysia, data.gov.my, PriceCatcher (`api/prices.ts`), Yahoo Finance |
 | Public health and safety | Daily blood donations, health and incident news, regional earthquakes | data.gov.my, news outlets |
 | News and sentiment | Stories with photos by topic, with a headline tone score | Free Malaysia Today, Malay Mail, New Straits Times, Astro Awani, Utusan Malaysia, Sinar Harian |
-| Parliament and Cabinet | Whether the Dewan Rakyat sits today, upcoming sittings, the latest order paper, recent bills, and Cabinet news | parlimen.gov.my (`api/parliament.ts`), news outlets |
+| Parliament and Cabinet | Whether the Dewan Rakyat sits today, upcoming sittings, the latest order paper, recent bills, and Cabinet news | parlimen.gov.my (`public/parliament.json`), news outlets |
 
 ## State map
 
@@ -59,7 +59,9 @@ On the 89 hand-labelled headlines, the AI labelled 83% and 88% of tones correctl
 
 ## Parliament
 
-`api/parliament.ts` reads the Dewan Rakyat calendar, order paper list and bills from parlimen.gov.my, which has no API, and Vercel's CDN keeps the result for an hour. The site does not send its intermediate TLS certificate, so the function supplies Sectigo's public intermediate and still verifies the connection fully. If the site changes its page layout, the parsers in that file need updating (their tests use trimmed copies of the real pages). The Cabinet does not publish meeting dates or decisions as data, so the panel shows Cabinet news instead.
+parlimen.gov.my has no API and does not answer cloud servers (Vercel and GitHub Actions both time out), so the Parliament data is a file in the repo, `public/parliament.json`. Refresh it from a computer in Malaysia with `npm run parliament`, then commit and push. The sitting calendar is set once per meeting, so the file mainly goes stale on new bills, and the panel shows the date it was refreshed. The link to today's order paper is built from the date, so it always points at the current one.
+
+The site does not send its intermediate TLS certificate, so `scripts/parliament.ts` supplies Sectigo's public intermediate and still verifies the connection fully. If the site changes its page layout, the parsers in `src/lib/parliament.ts` need updating (their tests use trimmed copies of the real pages). The Cabinet does not publish meeting dates or decisions as data, so the panel shows Cabinet news instead.
 
 ## Known limits
 

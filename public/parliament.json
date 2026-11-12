@@ -1,0 +1,237 @@
+{
+ "meeting": {
+  "name": "Third Meeting",
+  "start": "2026-10-05",
+  "end": "2026-12-08"
+ },
+ "sittings": [
+  {
+   "date": "2026-10-05",
+   "business": "Bills and other Government matters"
+  },
+  {
+   "date": "2026-10-06",
+   "business": "Bills and other Government matters"
+  },
+  {
+   "date": "2026-10-07",
+   "business": "Bills and other Government matters"
+  },
+  {
+   "date": "2026-10-08",
+   "business": "Bills and other Government matters"
+  },
+  {
+   "date": "2026-10-09",
+   "business": "Tabling of the 2027 Supply Bill (Budget) by the Finance Minister",
+   "note": "at 4.00pm - no session before the tabling"
+  },
+  {
+   "date": "2026-10-12",
+   "business": "Debate on 2027 Budget at the Policy-level"
+  },
+  {
+   "date": "2026-10-13",
+   "business": "Debate on 2027 Budget at the Policy-level"
+  },
+  {
+   "date": "2026-10-14",
+   "business": "Debate on 2027 Budget at the Policy-level"
+  },
+  {
+   "date": "2026-10-15",
+   "business": "Debate on 2027 Budget at the Policy-level"
+  },
+  {
+   "date": "2026-10-19",
+   "business": "Debate on 2027 Budget at the Policy-level"
+  },
+  {
+   "date": "2026-10-20",
+   "business": "Debate on 2027 Budget at the Policy-level"
+  },
+  {
+   "date": "2026-10-21",
+   "business": "Debate on 2027 Budget at the Policy-level"
+  },
+  {
+   "date": "2026-10-22",
+   "business": "Debate on 2027 Budget at the Policy-level"
+  },
+  {
+   "date": "2026-10-26",
+   "business": "Answers by the Ministers"
+  },
+  {
+   "date": "2026-10-27",
+   "business": "Answers by the Ministers"
+  },
+  {
+   "date": "2026-10-28",
+   "business": "Answers by the Ministers"
+  },
+  {
+   "date": "2026-10-29",
+   "business": "Answers by the Ministers"
+  },
+  {
+   "date": "2026-11-02",
+   "business": "Debate on 2027 Budget at the Comittee-level"
+  },
+  {
+   "date": "2026-11-03",
+   "business": "Debate on 2027 Budget at the Comittee-level"
+  },
+  {
+   "date": "2026-11-04",
+   "business": "Debate on 2027 Budget at the Comittee-level"
+  },
+  {
+   "date": "2026-11-05",
+   "business": "Debate on 2027 Budget at the Comittee-level"
+  },
+  {
+   "date": "2026-11-09",
+   "business": "No Session",
+   "note": "Cuti umum Hari Deepavali"
+  },
+  {
+   "date": "2026-11-10",
+   "business": "No Session"
+  },
+  {
+   "date": "2026-11-11",
+   "business": "Debate on 2027 Budget at the Comittee-level"
+  },
+  {
+   "date": "2026-11-12",
+   "business": "Debate on 2027 Budget at the Comittee-level"
+  },
+  {
+   "date": "2026-11-16",
+   "business": "Debate on 2027 Budget at the Comittee-level"
+  },
+  {
+   "date": "2026-11-17",
+   "business": "Debate on 2027 Budget at the Comittee-level"
+  },
+  {
+   "date": "2026-11-18",
+   "business": "Debate on 2027 Budget at the Comittee-level"
+  },
+  {
+   "date": "2026-11-19",
+   "business": "Debate on 2027 Budget at the Comittee-level"
+  },
+  {
+   "date": "2026-11-23",
+   "business": "Debate on 2027 Budget at the Comittee-level"
+  },
+  {
+   "date": "2026-11-24",
+   "business": "Debate on 2027 Budget at the Comittee-level"
+  },
+  {
+   "date": "2026-11-25",
+   "business": "Debate on 2027 Budget at the Comittee-level"
+  },
+  {
+   "date": "2026-11-26",
+   "business": "Debate on 2027 Budget at the Comittee-level"
+  },
+  {
+   "date": "2026-11-30",
+   "business": "Bills and other Government matters",
+   "note": "The Senate and House of Representatives sit concurrently"
+  },
+  {
+   "date": "2026-12-01",
+   "business": "Bills and other Government matters"
+  },
+  {
+   "date": "2026-12-02",
+   "business": "Bills and other Government matters"
+  },
+  {
+   "date": "2026-12-03",
+   "business": "Bills and other Government matters"
+  },
+  {
+   "date": "2026-12-07",
+   "business": "Bills and other Government matters",
+   "note": "The Senate and House of Representatives sit concurrently"
+  },
+  {
+   "date": "2026-12-08",
+   "business": "Bills and other Government matters"
+  }
+ ],
+ "bills": [
+  {
+   "code": "D.R.27/2026",
+   "title": "Registration of Criminals and Undesirable Persons (Amendment) Act 2026",
+   "status": "First Reading",
+   "firstReading": "2026-10-21",
+   "presenter": "Datuk Seri Dr. Shamsul Anuar bin Haji Nasarah (Timbalan Menteri Dalam Negeri)"
+  },
+  {
+   "code": "D.R.26/2026",
+   "title": "Adoption (Amendment) Bill 2026",
+   "status": "First Reading",
+   "firstReading": "2026-10-15",
+   "presenter": "Datuk Seri Dr. Shamsul Anuar bin Haji Nasarah (Timbalan Menteri Dalam Negeri)"
+  },
+  {
+   "code": "D.R.25/2026",
+   "title": "Supply Bill 2027",
+   "status": "First Reading",
+   "firstReading": "2026-10-06",
+   "presenter": "Datuk Seri Amir Hamzah Azizan (Menteri Kewangan II)"
+  },
+  {
+   "code": "D.R.24/2026",
+   "title": "Sport Development (Amendment) Bill 2026",
+   "status": "Passed",
+   "firstReading": "2026-10-05",
+   "secondReading": "2026-10-06",
+   "passed": "2026-10-06",
+   "presenter": "Dr. Mohammed Taufiq Johari (Menteri Belia dan Sukan)"
+  },
+  {
+   "code": "D.R.23/2026",
+   "title": "Food (Amendment) Bill 2026",
+   "status": "Passed",
+   "firstReading": "2026-10-05",
+   "secondReading": "2026-10-08",
+   "passed": "2026-10-08",
+   "presenter": "Datuk Seri Dr. Haji Dzulkefly Ahmad (Menteri Kesihatan)"
+  },
+  {
+   "code": "D.R.22/2026",
+   "title": "National Trust Fund Bill 2026",
+   "status": "Passed",
+   "firstReading": "2026-07-14",
+   "secondReading": "2026-07-16",
+   "passed": "2026-07-16",
+   "presenter": "Tuan Liew Chin Tong, Timbalan Menteri Kewangan"
+  },
+  {
+   "code": "D.R.21/2026",
+   "title": "Statistics Bill 2026",
+   "status": "Passed",
+   "firstReading": "2026-07-14",
+   "secondReading": "2026-07-16",
+   "passed": "2026-07-16",
+   "presenter": "Tuan Haji Akmal Nasrullah bin Mohd Nasir, Menteri Ekonomi"
+  },
+  {
+   "code": "D.R.20/2026",
+   "title": "Freedom of Information Bill 2026",
+   "status": "Referred to JKPK",
+   "firstReading": "2026-07-13",
+   "secondReading": "2026-07-14",
+   "presenter": "Dato' Sri Azalina binti Othman Said, Menteri di Jabatan Perdana Menteri (Undang-Undang dan Reformasi Institusi)"
+  }
+ ],
+ "updated": "2026-11-12"
+}

@@ -1,8 +1,8 @@
 import { joinGdpSeries, stateGdpShares, yearOnYearChange, type Point } from "./lib/economy.js";
 import { parseRss, type Headline } from "./lib/headlines.js";
 import type { Brief } from "../api/brief.js";
-import type { Parliament } from "../api/parliament.js";
 import type { StaplePrice } from "../api/prices.js";
+import type { Parliament } from "./lib/parliament.js";
 import type { DayMetrics } from "./lib/trends.js";
 import { activeWarnings, type Earthquake, type FloodStation, type WeatherWarning } from "./lib/warnings.js";
 
@@ -109,7 +109,7 @@ export const fetchBrief = () => getJson<Brief>("/api/brief");
 
 export const fetchStaplePrices = () => getJson<StaplePrice[]>("/api/prices");
 
-export const fetchParliament = () => getJson<Parliament>("/api/parliament");
+export const fetchParliament = () => getJson<Parliament>("/parliament.json");
 
 export const fetchHistory = () => getJson<DayMetrics[]>("/history.json");
 

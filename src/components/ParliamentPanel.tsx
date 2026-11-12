@@ -1,7 +1,7 @@
 import { fetchParliament, newsOutlets } from "../api";
 import { dayLabel } from "../lib/format";
 import type { Headline } from "../lib/headlines";
-import { malaysiaToday, sittingOutlook, sittingSummary } from "../lib/parliament";
+import { malaysiaToday, orderPaperUrl, parliamentSite, sits, sittingOutlook, sittingSummary } from "../lib/parliament";
 import { filterByTopic } from "../lib/topics";
 import { useFetch, type FetchState } from "../useFetch";
 import { AiSummary, Async, HeadlineList, Panel } from "./ui";
@@ -18,17 +18,17 @@ export function ParliamentPanel({ news, summary }: { news: FetchState<Headline[]
       <h3>Dewan Rakyat</h3>
       <Async state={parliament}>
         {(house) => {
-          const { upcoming } = sittingOutlook(house.sittings, today);
+          const { today: sitting, upcoming } = sittingOutlook(house.sittings, today);
           return (
             <>
               <p>{sittingSummary(house, today)}</p>
-              {house.orderPaper && (
-                <p>
-                  <a href={house.orderPaper.url} target="_blank" rel="noreferrer">
-                    {house.orderPaper.date === today ? "Today's order paper" : `Latest order paper, ${dayLabel(house.orderPaper.date)}`} (PDF)
-                  </a>
-                </p>
-              )}
+              <p>
+                {sitting && sits(sitting) ? (
+                  <a href={orderPaperUrl(today)} target="_blank" rel="noreferrer">Today's order paper (PDF)</a>
+                ) : (
+                  <a href={`${parliamentSite}/aum-dewan-rakyat.html?uweb=dr&lang=en`} target="_blank" rel="noreferrer">All order papers</a>
+                )}
+              </p>
               {upcoming.length > 0 && (
                 <ul className="rows">
                   {upcoming.map((sitting) => (
@@ -44,6 +44,10 @@ export function ParliamentPanel({ news, summary }: { news: FetchState<Headline[]
               )}
               {house.meeting && <p className="muted">{house.meeting.name}: {dayLabel(house.meeting.start)} to {dayLabel(house.meeting.end)}.</p>}
               <h3>Recent bills</h3>
+              <p className="muted">
+                As of {dayLabel(house.updated)}.{" "}
+                <a href={`${parliamentSite}/bills-dewan-rakyat.html?uweb=dr&lang=en`} target="_blank" rel="noreferrer">All bills</a>
+              </p>
               <ul className="rows">
                 {house.bills.map((bill) => (
                   <li key={bill.code}>

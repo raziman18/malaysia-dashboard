@@ -1,10 +1,9 @@
-import type { Parliament } from "../../api/parliament.js";
 import type { StaplePrice } from "../../api/prices.js";
 import type { FuelPrice } from "../api.js";
 import { percentChange, type GdpQuarter, type Point, type StateGdp } from "./economy.js";
 import { dayLabel, monthLabel, priceChangeLabel, quarterLabel, ringgit, ringgitBillions, ringgitChange, signedPercent, timeLabel } from "./format.js";
 import type { Headline } from "./headlines.js";
-import { sittingOutlook, sittingSummary } from "./parliament.js";
+import { sittingOutlook, sittingSummary, type Parliament } from "./parliament.js";
 import { airQualityBand } from "./status.js";
 import { filterByTopic } from "./topics.js";
 import { isFeedFresh, malaysiaTime, stationsAboveNormal, type Earthquake, type FloodStation, type WeatherWarning } from "./warnings.js";
@@ -108,7 +107,7 @@ export function parliamentFacts(parliament: Parliament | undefined, news: Headli
     lines.push(sittingSummary(parliament, today));
     const next = sittingOutlook(parliament.sittings, today, 1).upcoming[0];
     if (next) lines.push(`Next sitting: ${next.date}, ${next.business}`);
-    lines.push("Recent bills:", ...parliament.bills.slice(0, 5).map((bill) => `- ${bill.title}: ${bill.status}${bill.presenter ? `, presented by ${bill.presenter}` : ""}`));
+    lines.push(`Recent bills, as of ${parliament.updated}:`, ...parliament.bills.slice(0, 5).map((bill) => `- ${bill.title}: ${bill.status}${bill.presenter ? `, presented by ${bill.presenter}` : ""}`));
   }
   if (news) lines.push(...headlineLines("Cabinet news", filterByTopic(news, "cabinet")));
   return lines.join("\n");
