@@ -12,10 +12,14 @@ npm test
 
 | Panel | Data | Source |
 |---|---|---|
-| Disasters and weather | Active weather warnings, live rain radar, flood news, air quality in 16 state capitals | MET Malaysia and JPS (data.gov.my), MET radar, Open-Meteo, news outlets |
+| Disasters and weather | A state map of current issues, active weather warnings, live rain radar, flood news, air quality in 16 state capitals | MET Malaysia and JPS (data.gov.my), MET radar, Open-Meteo, news outlets |
 | Economy | Exchange rates, fuel prices and their weekly change, staple food prices, GDP, inflation, unemployment, FBM KLCI | Bank Negara Malaysia, data.gov.my, PriceCatcher (`api/prices.ts`), Yahoo Finance |
 | Public health and safety | Daily blood donations, health and incident news, regional earthquakes | data.gov.my, news outlets |
 | News and sentiment | Stories with photos by topic, with a headline tone score | Free Malaysia Today, Malay Mail, New Straits Times, Astro Awani, Utusan Malaysia, Sinar Harian |
+
+## State map
+
+The map colours each state by its worst current issue (`stateIssues` in `src/lib/states.ts`): weather warnings that name the state (sea warnings count lower), air that is unhealthy for sensitive groups or worse in its capital, rivers above normal when the JPS feed is fresh, and flood news that names the state. The boundaries come from DOSM's open data (DOSM Open Data Licence) and are turned into SVG paths by `scripts/build-state-shapes.mjs`.
 
 ## Install and alerts
 

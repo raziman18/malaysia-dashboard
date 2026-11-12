@@ -86,19 +86,21 @@ export async function fetchBloodDonations(): Promise<Point[]> {
   return rows.map((row) => ({ date: row.date, value: row.donations })).reverse();
 }
 
-const stateCapitals: [string, number, number][] = [
-  ["Kuala Lumpur", 3.139, 101.687], ["Putrajaya", 2.926, 101.696], ["Shah Alam", 3.073, 101.518],
-  ["Johor Bahru", 1.492, 103.741], ["Melaka", 2.189, 102.25], ["Seremban", 2.726, 101.938],
-  ["Ipoh", 4.597, 101.09], ["George Town", 5.414, 100.329], ["Alor Setar", 6.121, 100.367],
-  ["Kangar", 6.441, 100.198], ["Kota Bharu", 6.125, 102.238], ["Kuala Terengganu", 5.33, 103.137],
-  ["Kuantan", 3.807, 103.326], ["Kuching", 1.553, 110.359], ["Kota Kinabalu", 5.98, 116.073], ["Labuan", 5.28, 115.242],
+// City, state as named in DOSM's boundaries, latitude, longitude.
+const stateCapitals: [string, string, number, number][] = [
+  ["Kuala Lumpur", "W.P. Kuala Lumpur", 3.139, 101.687], ["Putrajaya", "W.P. Putrajaya", 2.926, 101.696],
+  ["Shah Alam", "Selangor", 3.073, 101.518], ["Johor Bahru", "Johor", 1.492, 103.741], ["Melaka", "Melaka", 2.189, 102.25],
+  ["Seremban", "Negeri Sembilan", 2.726, 101.938], ["Ipoh", "Perak", 4.597, 101.09], ["George Town", "Pulau Pinang", 5.414, 100.329],
+  ["Alor Setar", "Kedah", 6.121, 100.367], ["Kangar", "Perlis", 6.441, 100.198], ["Kota Bharu", "Kelantan", 6.125, 102.238],
+  ["Kuala Terengganu", "Terengganu", 5.33, 103.137], ["Kuantan", "Pahang", 3.807, 103.326], ["Kuching", "Sarawak", 1.553, 110.359],
+  ["Kota Kinabalu", "Sabah", 5.98, 116.073], ["Labuan", "W.P. Labuan", 5.28, 115.242],
 ];
 
 export async function fetchAirQuality() {
-  const latitudes = stateCapitals.map(([, latitude]) => latitude).join(",");
-  const longitudes = stateCapitals.map(([, , longitude]) => longitude).join(",");
+  const latitudes = stateCapitals.map(([, , latitude]) => latitude).join(",");
+  const longitudes = stateCapitals.map(([, , , longitude]) => longitude).join(",");
   const readings = await getJson<{ current: { us_aqi: number } }[]>(`/api/air/air-quality?latitude=${latitudes}&longitude=${longitudes}&current=us_aqi`);
-  return stateCapitals.map(([city], index) => ({ city, aqi: readings[index].current.us_aqi })).sort((a, b) => b.aqi - a.aqi);
+  return stateCapitals.map(([city, state], index) => ({ city, state, aqi: readings[index].current.us_aqi })).sort((a, b) => b.aqi - a.aqi);
 }
 
 export const fetchBrief = () => getJson<Brief>("/api/brief");

@@ -2,7 +2,7 @@ import type { Headline } from "./headlines.js";
 
 // Keywords matched at the start of words in the title and description. English and common Malay terms.
 export const topics = {
-  flood: /\b(flood|banjir|evacuat|relief cent|landslide|tanah runtuh)/i,
+  flood: /\b(flood|banjir|kepala air|evacuat|relief cent|landslide|tanah runtuh)/i,
   health: /\b(health|hospital|dengue|clinic|KKM|disease|vaccin|patient|medic|outbreak|kesihatan)/i,
   safety: /\b(police|polis|accident|crash|crime|fire|murder|arrest|robbery|drown|scam|kemalangan)/i,
   economy: /\b(econom|ringgit|Bursa|inflation|GDP|trade|invest|export|budget|subsid|price|tariff)/i,

@@ -501,3 +501,37 @@ figure {
 .price .muted {
   font-size: 0.8rem;
 }
+
+.state-map svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.state-map path {
+  fill: var(--tone-neutral);
+  stroke: var(--panel);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+
+.state-map path.status-warning { fill: var(--warning); }
+.state-map path.status-serious { fill: var(--serious); }
+.state-map path.status-critical { fill: var(--critical); }
+
+.state-map figcaption {
+  display: grid;
+  gap: 4px;
+  margin-top: 8px;
+  font-size: 0.8rem;
+}
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+}
+
+.state-issues span span {
+  display: block;
+}

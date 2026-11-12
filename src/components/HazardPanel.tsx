@@ -4,6 +4,7 @@ import { airQualityBand } from "../lib/status";
 import type { Headline } from "../lib/headlines";
 import { isFeedFresh, latestStationUpdate, malaysiaTime, stationsAboveNormal, type FloodStation, type WeatherWarning } from "../lib/warnings";
 import { useFetch, type FetchState } from "../useFetch";
+import { StateMap } from "./StateMap";
 import { AiSummary, Async, HeadlineList, Panel, StatusBadge } from "./ui";
 
 type AirReadings = Awaited<ReturnType<typeof fetchAirQuality>>;
@@ -26,6 +27,8 @@ export function HazardPanel({ warnings, air, stations, floodNews, summary }: Pro
   return (
     <Panel title="Disasters and weather" sources={`MET Malaysia and JPS via data.gov.my, MET Malaysia radar, Open-Meteo air quality, ${newsOutlets}`} feeds={[warnings, air, stations, floodNews]}>
       <AiSummary summary={summary} />
+      <h3>Issues by state</h3>
+      <StateMap warnings={warnings.data} air={air.data} stations={stations.data} floodNews={floodNews.data} />
       <h3>Active weather warnings</h3>
       <Async state={warnings}>
         {(list) =>
