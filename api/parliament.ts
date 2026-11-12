@@ -165,7 +165,11 @@ export async function GET(): Promise<Response> {
     fetchPage("aum-dewan-rakyat.html?uweb=dr&lang=en").catch(() => ""),
     fetchPage("bills-dewan-rakyat.html?uweb=dr&lang=en").catch(() => ""),
   ]).catch((error: Error) => error);
-  if (pages instanceof Error) return json({ error: `Could not read parlimen.gov.my: ${pages.message}` }, 502);
+  if (pages instanceof Error) {
+    // A failed connection to each of the site's addresses arrives as one error without a message.
+    const codes = pages instanceof AggregateError ? pages.errors.map((error) => error.code ?? error.message).join(", ") : "";
+    return json({ error: `Could not read parlimen.gov.my: ${pages.message || codes}` }, 502);
+  }
   const [calendar, orderPapers, bills] = pages;
 
   // The meeting under way, or the next one this year.
