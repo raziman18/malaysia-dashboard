@@ -8,7 +8,7 @@ import { AiSummary, Async, HeadlineList, Panel } from "./ui";
 
 const weekdayLabel = (date: string) => new Date(date).toLocaleDateString("en-MY", { weekday: "short", day: "numeric", month: "short" });
 
-export function ParliamentPanel({ news, summary }: { news: FetchState<Headline[]>; summary?: string }) {
+export function ParliamentPanel({ news, summary, billSummaries = {} }: { news: FetchState<Headline[]>; summary?: string; billSummaries?: Record<string, string> }) {
   const parliament = useFetch(fetchParliament);
   const today = malaysiaToday();
 
@@ -48,6 +48,9 @@ export function ParliamentPanel({ news, summary }: { news: FetchState<Headline[]
                 As of {dayLabel(house.updated)}.{" "}
                 <a href={`${parliamentSite}/bills-dewan-rakyat.html?uweb=dr&lang=en`} target="_blank" rel="noreferrer">All bills</a>
               </p>
+              {house.bills.some((bill) => billSummaries[bill.code]) && (
+                <p className="muted">Bill summaries are written by AI from each bill's explanatory statement and may contain mistakes.</p>
+              )}
               <ul className="rows">
                 {house.bills.map((bill) => (
                   <li key={bill.code}>
@@ -59,6 +62,7 @@ export function ParliamentPanel({ news, summary }: { news: FetchState<Headline[]
                         {!bill.passed && bill.firstReading && `, first reading ${dayLabel(bill.firstReading)}`}
                         {bill.presenter && `, presented by ${bill.presenter}`}
                       </span>
+                      {billSummaries[bill.code] && <span className="bill-summary">{billSummaries[bill.code]}</span>}
                     </span>
                     <strong className="bill-status">{bill.status}</strong>
                   </li>

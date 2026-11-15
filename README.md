@@ -63,6 +63,8 @@ parlimen.gov.my has no API and does not answer cloud servers (Vercel and GitHub 
 
 The site does not send its intermediate TLS certificate, so `scripts/parliament.ts` supplies Sectigo's public intermediate and still verifies the connection fully. If the site changes its page layout, the parsers in `src/lib/parliament.ts` need updating (their tests use trimmed copies of the real pages). The Cabinet does not publish meeting dates or decisions as data, so the panel shows Cabinet news instead.
 
+Each recent bill gets a short AI summary. The script reads each new bill's PDF once with `unpdf` and saves the bill's explanatory statement (the plain-language part at the end of every bill) in `parliament.json`. The site serves those PDFs only with the session cookie from its bills page, so the script keeps that cookie and visitors are not linked to the PDFs. `/api/brief` sends the title and the start of each statement to `/api/summary?kind=bill`, whose instructions keep the summary to what the statement says. Like the panel summaries, each answer is cached for 30 days, so Groq sees each bill once.
+
 ## Categories
 
 The sidebar (a dropdown on phones and tablets) shows one panel at a time. The choice is kept in the address, such as `/#economy`, so a filtered view can be bookmarked or shared. "All" shows every panel with the daily brief and the most urgent items.

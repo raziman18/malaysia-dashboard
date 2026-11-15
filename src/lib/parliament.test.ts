@@ -1,5 +1,5 @@
 import { expect, it } from "vitest";
-import { malaysiaToday, orderPaperUrl, parseBills, parseMeetings, parseSittings, sittingOutlook, sittingSummary } from "./parliament";
+import { billFiles, explanatoryStatement, malaysiaToday, orderPaperUrl, parseBills, parseMeetings, parseSittings, sittingOutlook, sittingSummary } from "./parliament";
 
 // Trimmed from parlimen.gov.my pages saved on 12 Nov 2026.
 const calendar = `
@@ -109,4 +109,29 @@ it("uses the Malaysian date late in the UTC day", () => {
 
 it("links the order paper for a sitting day", () => {
   expect(orderPaperUrl("2026-11-12")).toBe("https://www.parlimen.gov.my/files/opindex/pdf/OPDR-12112026.pdf");
+});
+
+it("finds each bill's PDF on the bills page", () => {
+  const html = `<a href="#" onclick="loadResult('/files/billindex/pdf/2026/DR/Statistics Bill 2026.pdf','Statistics Bill 2026.pdf');">
+    D.R.21/2026
+    </a>`;
+  expect(billFiles(html)).toEqual(new Map([["D.R.21/2026", "/files/billindex/pdf/2026/DR/Statistics Bill 2026.pdf"]]));
+});
+
+it("takes the explanatory statement from a bill's text", () => {
+  const pdfText = `2. Clause text that is not wanted.
+EXPLANATORY STATEMENT
+The Bill seeks to provide for the functions of
+the Department of Statistics Malaysia.
+Bill16
+2. Clause 21 seeks to repeal the Statistics Act 1965.
+FINANCIAL IMPLICATION
+This Bill will involve the Government in extra financial expenditure.
+[PN(U2)3429]`;
+  expect(explanatoryStatement(pdfText)).toBe(
+    "The Bill seeks to provide for the functions of the Department of Statistics Malaysia. 2. Clause 21 seeks to repeal the Statistics Act 1965.",
+  );
+  expect(explanatoryStatement("HURAIAN\nRang Undang-Undang ini bertujuan meminda Akta.\n12\nIMPLIKASI KEWANGAN\nTiada.")).toBe("Rang Undang-Undang ini bertujuan meminda Akta.");
+  expect(explanatoryStatement(pdfText, 20)).toBe("The Bill seeks to pr");
+  expect(explanatoryStatement("No statement here")).toBeUndefined();
 });

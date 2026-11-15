@@ -623,6 +623,12 @@ figure {
   font-size: 0.85rem;
 }
 
+.bill-summary {
+  display: block;
+  margin-top: 6px;
+  font-size: 0.9rem;
+}
+
 .bill-status {
   flex: none;
   font-size: 0.85rem;

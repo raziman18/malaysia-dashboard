@@ -1,9 +1,10 @@
 // Refreshes public/parliament.json from parlimen.gov.my. The site does not answer cloud servers such as Vercel
 // or GitHub Actions, so run this from a computer in Malaysia: npm run parliament
-import { writeFileSync } from "node:fs";
+import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { request } from "node:https";
 import { rootCertificates } from "node:tls";
-import { malaysiaToday, parliamentSite, parseBills, parseMeetings, parseSittings, type Parliament } from "../src/lib/parliament.js";
+import { extractText, getDocumentProxy } from "unpdf";
+import { billFiles, explanatoryStatement, malaysiaToday, parliamentSite, parseBills, parseMeetings, parseSittings, type Parliament } from "../src/lib/parliament.js";
 
 // parlimen.gov.my does not send the intermediate certificate that browsers fetch on their own, so Node cannot
 // verify it. This is Sectigo's public intermediate (Sectigo Public Server Authentication CA DV R36, valid until
@@ -48,18 +49,21 @@ JEltkYnTAH41QJ6SAWO66GrrUESwN/cgZzL4JLEqz1Y=
 const ca = [...rootCertificates, sectigoIntermediate];
 const billCount = 8;
 
-function fetchPage(path: string): Promise<string> {
+// The site sets a session cookie on the bills page and serves bill PDFs only to requests that send it back.
+let cookie = "";
+
+function fetchFile(path: string): Promise<Buffer> {
   return new Promise((resolve, reject) => {
-    const page = request(`${parliamentSite}/${path}`, { ca, headers: { "User-Agent": "Mozilla/5.0" }, timeout: 60_000 }, (response) => {
+    const page = request(`${parliamentSite}/${path}`, { ca, headers: { "User-Agent": "Mozilla/5.0", Cookie: cookie }, timeout: 60_000 }, (response) => {
       if (response.statusCode !== 200) {
         response.resume();
         reject(new Error(`parlimen.gov.my returned ${response.statusCode} for ${path}`));
         return;
       }
-      let body = "";
-      response.setEncoding("utf8");
-      response.on("data", (chunk: string) => (body += chunk));
-      response.on("end", () => resolve(body));
+      cookie ||= (response.headers["set-cookie"] ?? []).map((value) => value.split(";")[0]).join("; ");
+      const chunks: Buffer[] = [];
+      response.on("data", (chunk: Buffer) => chunks.push(chunk));
+      response.on("end", () => resolve(Buffer.concat(chunks)));
     });
     page.on("timeout", () => page.destroy(new Error("parlimen.gov.my did not respond")));
     page.on("error", reject);
@@ -67,16 +71,40 @@ function fetchPage(path: string): Promise<string> {
   });
 }
 
+const fetchPage = async (path: string) => (await fetchFile(path)).toString("utf8");
+
+// Bill PDFs do not change, so each one is read only once and its statement is kept from the last saved file.
+async function explanation(code: string, file: string | undefined, saved: Parliament | undefined) {
+  const known = saved?.bills.find((bill) => bill.code === code)?.explanation;
+  if (known || !file) return known;
+  try {
+    const pdf = await getDocumentProxy(new Uint8Array(await fetchFile(encodeURI(file.slice(1)))));
+    return explanatoryStatement((await extractText(pdf, { mergePages: true })).text);
+  } catch (error) {
+    console.warn(`Could not read the PDF for ${code}: ${(error as Error).message}`);
+    return undefined;
+  }
+}
+
+const savedFile = "public/parliament.json";
+const saved: Parliament | undefined = existsSync(savedFile) ? JSON.parse(readFileSync(savedFile, "utf8")) : undefined;
 const today = malaysiaToday();
-const [calendar, bills] = await Promise.all([fetchPage("takwim-dewan-rakyat.html?uweb=dr&lang=en"), fetchPage("bills-dewan-rakyat.html?uweb=dr&lang=en")]);
+// The bills page comes first so its session cookie is set before the bill PDFs are requested.
+const bills = await fetchPage("bills-dewan-rakyat.html?uweb=dr&lang=en");
+const calendar = await fetchPage("takwim-dewan-rakyat.html?uweb=dr&lang=en");
 // The meeting under way, or the next one this year.
 const meeting = parseMeetings(calendar).find((item) => item.end >= today);
+const files = billFiles(bills);
+const recentBills = parseBills(bills).slice(0, billCount);
+// One PDF at a time, to go easy on the site.
+for (const bill of recentBills) bill.explanation = await explanation(bill.code, files.get(bill.code), saved);
 const parliament: Parliament = {
   meeting: meeting && { name: meeting.name, start: meeting.start, end: meeting.end },
   sittings: meeting ? parseSittings(await fetchPage(`takwim-dewan-rakyat.html?uweb=dr&lang=en&${meeting.id}`)) : [],
-  bills: parseBills(bills).slice(0, billCount),
+  bills: recentBills,
   updated: today,
 };
 if (!parliament.bills.length) throw new Error("No bills found. The bills page layout may have changed.");
-writeFileSync("public/parliament.json", `${JSON.stringify(parliament, null, 1)}\n`);
-console.log(`Saved ${parliament.meeting?.name ?? "no meeting"}, ${parliament.sittings.length} sitting days and ${parliament.bills.length} bills.`);
+writeFileSync(savedFile, `${JSON.stringify(parliament, null, 1)}\n`);
+const explained = parliament.bills.filter((bill) => bill.explanation).length;
+console.log(`Saved ${parliament.meeting?.name ?? "no meeting"}, ${parliament.sittings.length} sitting days and ${parliament.bills.length} bills (${explained} with statements).`);

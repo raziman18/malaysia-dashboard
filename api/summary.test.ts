@@ -19,6 +19,14 @@ describe("summarise", () => {
     expect(body.messages[1].content).toBe("Panel: Economy\nInflation: 1.2%");
   });
 
+  it("uses the bill instructions for kind=bill", async () => {
+    const fetchSpy = groqReply('{"summary":"It repeals the Statistics Act 1965."}');
+    const request = new Request(`https://site.app/api/summary?kind=bill&facts=${encodeURIComponent("Statistics Bill 2026")}`, { headers: { "x-internal-key": internalKey("key") } });
+    expect(await (await summarise(request, "key")).json()).toEqual({ summary: "It repeals the Statistics Act 1965." });
+    const body = JSON.parse(fetchSpy.mock.calls[0][1]!.body as string);
+    expect(body.messages[0].content).toContain("bill before Malaysia's Parliament");
+  });
+
   it("refuses callers other than /api/brief, without calling Groq", async () => {
     const fetchSpy = vi.spyOn(globalThis, "fetch");
     expect((await summarise(url("Floods", {}), "key")).status).toBe(403);

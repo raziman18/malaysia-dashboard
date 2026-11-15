@@ -24,6 +24,8 @@ export interface Bill {
   secondReading?: string;
   passed?: string;
   presenter?: string;
+  // The explanatory statement at the end of the bill's PDF, which the AI summary is based on.
+  explanation?: string;
 }
 
 // Saved in public/parliament.json by scripts/parliament.ts.
@@ -87,6 +89,26 @@ export function parseBills(html: string): Bill[] {
       };
     },
   );
+}
+
+// Each bill's PDF, by code. The site serves these only with the session cookie from the bills page.
+export const billFiles = (html: string) =>
+  new Map([...html.matchAll(/loadResult\('([^']+\.pdf)'[^>]*>\s*(D\.R\.\d+\/\d{4})/g)].map(([, file, code]) => [code, file]));
+
+// The explanatory statement from a bill's text, in English or Malay, without page headers and the financial note.
+export function explanatoryStatement(pdfText: string, maxLength = 6000): string | undefined {
+  const start = pdfText.search(/^\s*(EXPLANATORY STATEMENT|HURAIAN)\s*$/m);
+  if (start < 0) return undefined;
+  const statement = pdfText
+    .slice(start)
+    .split(/^\s*(?:FINANCIAL IMPLICATIONS?|IMPLIKASI KEWANGAN)\s*$/m)[0]
+    .split("\n")
+    .slice(1)
+    .filter((line) => !/^\s*(Bill|Rang Undang-Undang)?\s*\d+\s*$/.test(line))
+    .join(" ")
+    .replace(/\s+/g, " ")
+    .trim();
+  return statement.slice(0, maxLength) || undefined;
 }
 
 export const sits = (sitting: Sitting) => !/no session/i.test(sitting.business);

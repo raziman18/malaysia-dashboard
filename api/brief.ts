@@ -24,6 +24,8 @@ export type BriefPanel = "daily" | "hazards" | "economy" | "health" | "news" | "
 export interface Brief {
   labels: Record<string, AiLabel>;
   summaries: Partial<Record<BriefPanel, string>>;
+  // AI summaries of recent bills, by bill code such as D.R.21/2026.
+  bills: Record<string, string>;
   // Today's figures for the trends panel.
   metrics: Omit<DayMetrics, "date">;
   generated: string;
@@ -36,6 +38,9 @@ const summaryMemo = new Map<string, string>();
 const optional = <T>(promise: Promise<T>) => promise.catch(() => undefined);
 const workers = 4;
 const labelTimeMs = 25_000;
+// Enough of a bill's explanatory statement for its purpose and main changes, and short enough to keep the URL small
+// and Groq's per-minute token limit in reach.
+const billFactsLength = 3000;
 
 export async function buildBrief(request: Request, apiKey: string | undefined): Promise<Response> {
   if (!apiKey) return json({ error: "GROQ_API_KEY is not set" }, 503);
@@ -86,10 +91,23 @@ export async function buildBrief(request: Request, apiKey: string | undefined): 
     }),
   );
 
+  const bills: Brief["bills"] = {};
+  const explained = parliament?.bills.filter((bill) => bill.explanation) ?? [];
+  await Promise.all(
+    explained.map(async ({ code, title, explanation }) => {
+      const text = `${title}\n\n${explanation!.slice(0, billFactsLength)}`;
+      const summary = summaryMemo.get(text) ?? (await ask<{ summary: string }>(`/api/summary?kind=bill&facts=${encodeURIComponent(text)}`))?.summary;
+      if (summary) {
+        summaryMemo.set(text, summary);
+        bills[code] = summary;
+      }
+    }),
+  );
+
   // An unfinished brief is kept only briefly, so the missing parts are filled in soon.
-  const complete = Object.keys(labels).length === new Set(news?.map((headline) => headline.title)).size && Object.values(summaries).every(Boolean);
+  const complete = Object.keys(labels).length === new Set(news?.map((headline) => headline.title)).size && Object.values(summaries).every(Boolean) && Object.keys(bills).length === explained.length;
   const metrics = dayMetrics({ news: labelled, warnings, air, klci, rates });
-  const brief: Brief = { labels, summaries, metrics, generated: new Date().toISOString() };
+  const brief: Brief = { labels, summaries, bills, metrics, generated: new Date().toISOString() };
   return json(brief, 200, `public, s-maxage=${complete ? 1800 : 120}, stale-while-revalidate=86400`);
 }
 

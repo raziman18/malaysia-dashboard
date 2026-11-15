@@ -104,7 +104,7 @@ export function App() {
             {shows("economy") && <EconomyPanel rates={rates} klci={klci} summary={summaries.economy} />}
             {shows("health") && <HealthSafetyPanel earthquakes={earthquakes} news={news} summary={summaries.health} />}
             {shows("news") && <NewsPanel news={news} summary={summaries.news} />}
-            {shows("parliament") && <ParliamentPanel news={news} summary={summaries.parliament} />}
+            {shows("parliament") && <ParliamentPanel news={news} summary={summaries.parliament} billSummaries={brief.data?.bills} />}
             {shows("trends") && <TrendsPanel />}
             {shows("sources") && <SourcesPanel sources={sources} />}
           </div>
