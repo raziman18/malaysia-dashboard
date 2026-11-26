@@ -148,5 +148,15 @@
   "floodStories": 11,
   "klci": 1561.6800537109375,
   "usd": 4.1175
+ },
+ {
+  "date": "2026-11-27",
+  "headlines": 221,
+  "negativeShare": 12.7,
+  "warnings": 4,
+  "worstAqi": 86,
+  "floodStories": 4,
+  "klci": 1562.2900390625,
+  "usd": 4.116
  }
 ]
